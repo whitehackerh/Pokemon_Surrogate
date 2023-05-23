@@ -1,0 +1,20 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+
+# Django
+*.log
+db.sqlite3
+/media
+/staticfiles
+
+# IDE/Editor specific
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Dependency management
+/venv/
+/pipenv/
