@@ -19,7 +19,7 @@ from django.urls import path, include
 # from api.views import TestAPIView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     # path('test/', TestAPIView.as_view(), name='test'),
     path('api/', include('api.urls'))
 ]
