@@ -2,9 +2,10 @@ from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from api.Enums.ResponseCodes import ResponseCodes
 from api.Exceptions.CustomExceptions import CustomExceptions
+from api.Services.BaseService import BaseService
 from api.Enums.Path import Path
 
-class SignupService():
+class SignupService(BaseService):
     def service(self, request):
         try:
             param = {
