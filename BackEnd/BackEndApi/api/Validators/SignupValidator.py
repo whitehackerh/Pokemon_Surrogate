@@ -5,7 +5,7 @@ from api.Enums.ResponseCodes import ResponseCodes
 from api.Exceptions.CustomExceptions import CustomExceptions
 
 class SignupValidator(serializers.Serializer):
-    password = serializers.CharField()
+    password = serializers.CharField(max_length=128)
     username = serializers.CharField(max_length=150)
     first_name = serializers.CharField(max_length=150)
     last_name = serializers.CharField(max_length=150)
