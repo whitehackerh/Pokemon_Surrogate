@@ -16,7 +16,7 @@ class BaseResponder:
             self.responseCode = e['code']
             self.data['errors'] = e['message']
         
-    def setResponse(self, data):
+    def setResponse(self, data=None):
         self.responseParameter['responseCode'] = self.responseCode
         self.responseParameter['time'] = self.getTime()
         self.responseParameter['apiname'] = self.apiName
@@ -27,8 +27,8 @@ class BaseResponder:
             self.responseParameter['data'] = self.data
     
     def getResponse(self):
-        return Response(self.responseParameter)
+        return Response(self.responseParameter, self.statusCode)
 
-    def getTime():
+    def getTime(self):
         return datetime.now().strftime("%m-%d-%Y %H:%M:%S")
 
