@@ -1,29 +1,29 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import serializers
-from api.Validators.SetUserInfoValidator import SetUserInfoValidator
-from api.Services.SetUserInfoService import SetUserInfoService
-from api.Responders.SetUserInfoResponder import SetUserInfoResponder
+from api.Validators.SetUserProfileValidator import SetUserProfileValidator
+from api.Services.SetUserProfileService import SetUserProfileService
+from api.Responders.SetUserProfileResponder import SetUserProfileResponder
 from api.Enums.ResponseCodes import ResponseCodes
 from api.Exceptions.CustomExceptions import CustomExceptions
 
-class SetUserInfoView(APIView):
+class SetUserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
-            validator = SetUserInfoValidator(data=request.data)
+            validator = SetUserProfileValidator(data=request.data)
             validator.is_valid(raise_exception=True)
-            service = SetUserInfoService()
+            service = SetUserProfileService()
             data = service.service(request.data)
-            responder = SetUserInfoResponder()
+            responder = SetUserProfileResponder()
             responder.setResponse(data)
             return responder.getResponse()
         except serializers.ValidationError as e:
-            responder = SetUserInfoResponder({'message': e.detail, 'code': ResponseCodes.VALIDATION_ERROR})
+            responder = SetUserProfileResponder({'message': e.detail, 'code': ResponseCodes.VALIDATION_ERROR})
             responder.setResponse()
             return responder.getResponse()
         except CustomExceptions as e:
-            responder = SetUserInfoResponder({'message': e.message, 'code': e.code})
+            responder = SetUserProfileResponder({'message': e.message, 'code': e.code})
             responder.setResponse()
             return responder.getResponse()
