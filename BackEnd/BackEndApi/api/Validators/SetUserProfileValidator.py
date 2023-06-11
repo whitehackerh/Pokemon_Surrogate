@@ -4,7 +4,7 @@ from api.Enums.Messages import Messages
 from api.Enums.ResponseCodes import ResponseCodes
 from api.Exceptions.CustomExceptions import CustomExceptions
 
-class SetUserInfoValidator(serializers.Serializer):
+class SetUserProfileValidator(serializers.Serializer):
     id = serializers.IntegerField()
     username = serializers.CharField(max_length=150)
     first_name = serializers.CharField(max_length=150)

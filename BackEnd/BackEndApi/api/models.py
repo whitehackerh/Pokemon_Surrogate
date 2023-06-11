@@ -22,7 +22,7 @@ class Users(AbstractUser):
     class Meta:
         db_table = 'users'
 
-    def setUserInfo(self, request):
+    def setUserProfile(self, request):
         try:
             user = Users.objects.get(id=request.get('id'))
             user.username = request.get('username')
