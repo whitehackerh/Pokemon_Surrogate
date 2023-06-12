@@ -22,6 +22,12 @@ class Users(AbstractUser):
     class Meta:
         db_table = 'users'
 
+    def getUserProfile(self, id):
+        try:
+            return Users.objects.get(id=id)
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+        
     def setUserProfile(self, request):
         try:
             user = Users.objects.get(id=request.get('id'))
