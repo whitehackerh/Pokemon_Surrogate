@@ -3,14 +3,11 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from api.Enums.ResponseCodes import ResponseCodes
 from api.Exceptions.CustomExceptions import CustomExceptions
+# from .models1 import Model1
+# from .models2 import Model2
 
-class YourModel(models.Model):
-    field1 = models.CharField(max_length=100)
-    field2 = models.IntegerField()
-    # 他のフィールドの定義
-
-    def __str__(self):
-        return self.field1
+# __all__ = ['Model1', 'Model2']
+__all__ = ['Users']
 
 class Users(AbstractUser):
     nickname = models.CharField(max_length=255)
