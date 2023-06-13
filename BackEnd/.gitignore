@@ -8,6 +8,7 @@ __pycache__/
 db.sqlite3
 /media
 /staticfiles
+settings_local.py
 
 # IDE/Editor specific
 .idea/

@@ -8,7 +8,6 @@ from api.Views.GetUserProfileView import GetUserProfileView
 from api.Views.SetUserProfileView import SetUserProfileView
 
 urlpatterns = [
-    path('test', TestAPIView.as_view(), name='test'),
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
     path('signup', SignupView.as_view(), name='signup'),
     path('login', LoginView.as_view(), name='login'),
