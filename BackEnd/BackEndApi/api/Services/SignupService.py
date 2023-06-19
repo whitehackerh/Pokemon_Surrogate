@@ -27,7 +27,8 @@ class SignupService(BaseService):
             model.save()
 
             data = {
-                'token': Token.objects.create(user=model).key,
+                'access_token': Token.objects.create(user=model).key,
+                'token_type': 'Token',
                 'id': model.id,
                 'username': model.username,
                 'is_staff': model.is_staff

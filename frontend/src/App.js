@@ -8,34 +8,46 @@ import {
   Link,
   useLocation
 } from "react-router-dom";
-import { noTokenRequest } from './http';
+import Header from "./components/modules/Header";
+import HomeBar from "./components/modules/HomeBar";
+import Home from "./components/pages/home/Home";
+import Login from "./components/pages/login/Login";
+import Signup from "./components/pages/signup/Signup";
+import ProfileSettings from "./components/pages/accountSettings/ProfileSettings";
+import SignupStaff from "./components/pages/accountSettings/SignupStaff";
 
-function App() {
-  function test() {
-    noTokenRequest.get('/test', {
-    }).then((res) => {
-      console.log('res.data.data');
-    })
-  }
+const Top = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" onClick={test} />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      <button onClick={test}>testAPI</button>
-    </div>
+    <h1></h1>
   );
+};
+
+const Menu = () => {
+  let location = useLocation();
+  return (
+    <>
+      <Header />
+      <HomeBar />
+      {location.pathname === "/" ? <Top /> : <></>}
+      <Outlet />
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Menu />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/profileSettings" element={<ProfileSettings />} />
+          <Route path="/signupStaff" element={<SignupStaff />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App;
