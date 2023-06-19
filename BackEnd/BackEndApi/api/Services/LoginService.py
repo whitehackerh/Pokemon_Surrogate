@@ -13,7 +13,8 @@ class LoginService(BaseService):
             if user is not None:
                 token, _ = Token.objects.get_or_create(user=user)
                 data = {
-                    'token': token.key,
+                    'access_token': token.key,
+                    'token_type': 'Token',
                     'id': user.id,
                     'username': user.username,
                     'is_staff': user.is_staff

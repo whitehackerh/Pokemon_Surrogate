@@ -19,7 +19,7 @@ class BaseResponder:
     def setResponse(self, data=None):
         self.responseParameter['responseCode'] = self.responseCode
         self.responseParameter['time'] = self.getTime()
-        self.responseParameter['apiname'] = self.apiName
+        self.responseParameter['apiName'] = self.apiName
         self.responseParameter['successful'] = self.successful
         if self.successful == 'success':
             self.responseParameter['data'] = data
