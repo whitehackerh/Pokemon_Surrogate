@@ -1,23 +1,23 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from api.Validators.GetUserProfileValidator import GetUserProfileValidator
-from api.Services.GetUserProfileService import GetUserProfileService
-from api.Responders.GetUserProfileResponder import GetUserProfileResponder
+from api.Validators.GetProfilePictureValidator import GetProfilePictureValidator
+from api.Services.GetProfilePictureService import GetProfilePictureService
+from api.Responders.GetProfilePictureResponder import GetProfilePictureResponder
 from api.Exceptions.CustomExceptions import CustomExceptions
 
-class GetUserProfileView(APIView):
+class GetProfilePictureView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
-            validator = GetUserProfileValidator(data=request.data)
+            validator = GetProfilePictureValidator(data=request.data)
             validator.is_valid(raise_exception=True)
-            service = GetUserProfileService()
+            service = GetProfilePictureService()
             data = service.service(request.data)
-            responder = GetUserProfileResponder()
+            responder = GetProfilePictureResponder()
             responder.setResponse(data)
             return responder.getResponse()
         except CustomExceptions as e:
-            responder = GetUserProfileResponder({'message': e.message, 'code': e.code})
+            responder = GetProfilePictureResponder({'message': e.message, 'code': e.code})
             responder.setResponse()
             return responder.getResponse()

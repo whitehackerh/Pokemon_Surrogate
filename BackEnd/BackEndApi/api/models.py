@@ -38,3 +38,12 @@ class Users(AbstractUser):
             user.save()
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+    
+    def setProfilePicture(self, id, path):
+        try:
+            user = Users.objects.get(id=id)
+            user.profile_picture = path
+            user.updated_at = timezone.now()
+            user.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)

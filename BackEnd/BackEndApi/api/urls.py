@@ -6,6 +6,8 @@ from api.Views.LoginView import LoginView
 from api.Views.LogoutView import LogoutView
 from api.Views.GetUserProfileView import GetUserProfileView
 from api.Views.SetUserProfileView import SetUserProfileView
+from api.Views.GetProfilePictureView import GetProfilePictureView
+from api.Views.SetProfilePictureView import SetProfilePictureView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -13,5 +15,7 @@ urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view(), name='logout'),
     path('getUserProfile', GetUserProfileView.as_view(), name='getUserProfile'),
-    path('setUserProfile', SetUserProfileView.as_view(), name='setUserProfile')
+    path('setUserProfile', SetUserProfileView.as_view(), name='setUserProfile'),
+    path('getProfilePicture', GetProfilePictureView.as_view(), name='getProfilePicture'),
+    path('setProfilePicture', SetProfilePictureView.as_view(), name='setProfilePicture')
 ]

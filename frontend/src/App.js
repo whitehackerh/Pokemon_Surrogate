@@ -14,6 +14,7 @@ import Home from "./components/pages/home/Home";
 import Login from "./components/pages/login/Login";
 import Signup from "./components/pages/signup/Signup";
 import ProfileSettings from "./components/pages/accountSettings/ProfileSettings";
+import ProfilePictureSettings from './components/pages/accountSettings/ProfilePictureSettings';
 import SignupStaff from "./components/pages/accountSettings/SignupStaff";
 
 const Top = () => {
@@ -43,6 +44,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/profileSettings" element={<ProfileSettings />} />
+          <Route path="/profilePictureSettings" element={<ProfilePictureSettings />} />
           <Route path="/signupStaff" element={<SignupStaff />} />
         </Route>
       </Routes>
