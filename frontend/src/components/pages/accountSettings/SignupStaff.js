@@ -26,7 +26,7 @@ export default function SignupStaff() {
     }
 
     function registerStaff() {    
-        noTokenRequest.post('/signupStaff', {
+        withTokenRequest.post('/signupStaff', {
             username: values.username,
             password: values.password,
             first_name: values.first_name,
@@ -56,7 +56,7 @@ export default function SignupStaff() {
     return (
         <>
             <div style={signupForm}>
-                <h2>Signup</h2>
+                <h2>Signup Staff</h2>
                 <TextField id="outlined-basic" label="Username" variant='outlined' name="username" value={values.username} onChange={handleChange}/><br /><br />
                 <TextField id="outlined-basic" type="password" label="Password" variant='outlined' name="password" value={values.password} onChange={handleChange}/><br /><br />
                 <TextField id="outlined-basic" label="First Name" variant='outlined' name="first_name" value={values.first_name} onChange={handleChange}/><br /><br />

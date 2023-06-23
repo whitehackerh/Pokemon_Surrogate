@@ -25,13 +25,15 @@ const Login = () => {
       password: values.password
     })
     .then((res) => {
-      localStorage.setItem('access_token', res.data.data.access_token);
-      localStorage.setItem('token_type', res.data.data.token_type);
-      localStorage.setItem('user_id', res.data.data.id);
-      if (res.data.data.is_staff) {
-        localStorage.setItem('is_staff', true);
-      }
-      navigate('/home');
+      if (res.data.data.id) {
+        localStorage.setItem('access_token', res.data.data.access_token);
+        localStorage.setItem('token_type', res.data.data.token_type);
+        localStorage.setItem('user_id', res.data.data.id);
+        if (res.data.data.is_staff) {
+          localStorage.setItem('is_staff', true);
+        }
+        navigate('/home');
+      } 
     })
     .catch((error) => {
       console.log(error);

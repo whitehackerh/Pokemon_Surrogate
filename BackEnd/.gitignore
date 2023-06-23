@@ -7,6 +7,7 @@ __pycache__/
 *.log
 db.sqlite3
 /media
+/BackEndApi/media/profile
 /staticfiles
 settings_local.py
 

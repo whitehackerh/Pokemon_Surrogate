@@ -8,6 +8,7 @@ from api.Enums.Path import Path
 class SignupService(BaseService):
     def service(self, request):
         try:
+            data = {}
             param = {
                 'password': request.get('password'),
                 'is_superuser': False,
@@ -26,13 +27,11 @@ class SignupService(BaseService):
             model.set_password(param['password'])
             model.save()
 
-            data = {
-                'access_token': Token.objects.create(user=model).key,
-                'token_type': 'Token',
-                'id': model.id,
-                'username': model.username,
-                'is_staff': model.is_staff
-            }
+            data['access_token'] = Token.objects.create(user=model).key
+            data['token_type'] = 'Token'
+            data['id'] = model.id
+            data['username'] = model.username
+            data['is_staff'] = model.is_staff
             return data
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)

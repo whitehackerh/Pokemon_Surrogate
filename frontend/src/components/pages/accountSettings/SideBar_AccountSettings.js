@@ -12,6 +12,7 @@ const SideBar_AccountSettings = () => {
     return (
         <div style={style}>
             <Link to="/profileSettings">Profile Settings</Link><br></br><br></br>
+            <Link to="/profilePictureSettings">Profile Picture</Link><br></br><br></br>
         </div>
     )
 }
