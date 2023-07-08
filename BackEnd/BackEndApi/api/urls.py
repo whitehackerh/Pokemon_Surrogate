@@ -8,6 +8,9 @@ from api.Views.GetUserProfileView import GetUserProfileView
 from api.Views.SetUserProfileView import SetUserProfileView
 from api.Views.GetProfilePictureView import GetProfilePictureView
 from api.Views.SetProfilePictureView import SetProfilePictureView
+from api.Views.SetListingView import SetListingView
+from api.Views.GetGameTitlesView import GetGameTitlesView
+from api.Views.GetAvailableFeeView import GetAvailableFeeView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -17,5 +20,8 @@ urlpatterns = [
     path('getUserProfile', GetUserProfileView.as_view(), name='getUserProfile'),
     path('setUserProfile', SetUserProfileView.as_view(), name='setUserProfile'),
     path('getProfilePicture', GetProfilePictureView.as_view(), name='getProfilePicture'),
-    path('setProfilePicture', SetProfilePictureView.as_view(), name='setProfilePicture')
+    path('setProfilePicture', SetProfilePictureView.as_view(), name='setProfilePicture'),
+    path('setListing', SetListingView.as_view(), name='setListing'),
+    path('getGameTitles', GetGameTitlesView.as_view(), name='getGameTitles'),
+    path('getAvailableFee', GetAvailableFeeView.as_view(), name='getAvailableFee')
 ]

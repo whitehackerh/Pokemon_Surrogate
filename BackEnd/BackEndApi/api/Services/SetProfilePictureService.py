@@ -16,7 +16,7 @@ class SetProfilePictureService(BaseService):
             id = request.data.get('id')
             model = Users()
             currentPath = model.getUserProfile(request.data.get('id')).profile_picture
-            ServiceUtils.makeDir(os.path.join(settings.MEDIA_ROOT, Path.PROFILE_PICTURE))
+            ServiceUtils.makeDir(os.path.join(settings.MEDIA_ROOT, Path.PROFILE_PICTURE_DIR))
             if request.data.get('delete') == True:
                 model.setProfilePicture(id, Path.DEFAULT_PROFILE_PICTURE)
                 self.__deleteProfilePicture(currentPath)
@@ -24,7 +24,7 @@ class SetProfilePictureService(BaseService):
                 filename = f"{id}_{uuid.uuid4().hex}.png"
                 while filename == os.path.basename(currentPath):
                     filename = f"{id}_{uuid.uuid4().hex}.png"
-                updatePath = os.path.join(Path.PROFILE_PICTURE, filename)
+                updatePath = os.path.join(Path.PROFILE_PICTURE_DIR, filename)
                 model.setProfilePicture(id, updatePath)
                 with open(os.path.join(settings.MEDIA_ROOT, updatePath), 'wb') as f:
                     for chunk in request.FILES.get('picture').chunks():

@@ -36,6 +36,7 @@ const Header = () => {
               onClose={handleMenuClose}
             >
               <MenuItem onClick={() => {handleMenuClose(); navigate("/profileSettings");}}>Account Settings</MenuItem>
+              <MenuItem onClick={() => {handleMenuClose(); navigate('/newListing');}}>Tradings</MenuItem>
               {staffMenu}
               <MenuItem onClick={() => {handleMenuClose(); LogoutEvent();}}>Logout</MenuItem>
             </Menu>

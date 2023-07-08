@@ -3,11 +3,13 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from api.Enums.ResponseCodes import ResponseCodes
 from api.Exceptions.CustomExceptions import CustomExceptions
-# from .models1 import Model1
-# from .models2 import Model2
+from api.Models.GameTitles import GameTitles
+from api.Models.Fees import Fees
+from api.Models.Listing import Listing
+from api.Models.ListingPictures import ListingPictures
+from api.Models.PurchaseRequests import PurchaseRequests
 
-# __all__ = ['Model1', 'Model2']
-__all__ = ['Users']
+__all__ = ['Users', 'GameTitles', 'Fees', 'Listing', 'ListingPictures', 'PurchaseRequests']
 
 class Users(AbstractUser):
     nickname = models.CharField(max_length=255)

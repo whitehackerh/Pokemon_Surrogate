@@ -16,6 +16,7 @@ import Signup from "./components/pages/signup/Signup";
 import ProfileSettings from "./components/pages/accountSettings/ProfileSettings";
 import ProfilePictureSettings from './components/pages/accountSettings/ProfilePictureSettings';
 import SignupStaff from "./components/pages/accountSettings/SignupStaff";
+import NewListing from "./components/pages/tradings/NewListing";
 
 const Top = () => {
   return (
@@ -46,6 +47,7 @@ const App = () => {
           <Route path="/profileSettings" element={<ProfileSettings />} />
           <Route path="/profilePictureSettings" element={<ProfilePictureSettings />} />
           <Route path="/signupStaff" element={<SignupStaff />} />
+          <Route path="/newListing" element={<NewListing />} />
         </Route>
       </Routes>
     </BrowserRouter>
