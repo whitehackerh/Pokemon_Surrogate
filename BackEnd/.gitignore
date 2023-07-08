@@ -8,6 +8,7 @@ __pycache__/
 db.sqlite3
 /media
 /BackEndApi/media/profile
+/BackEndApi/media/listing
 /staticfiles
 settings_local.py
 
