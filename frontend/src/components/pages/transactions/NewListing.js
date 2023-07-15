@@ -1,4 +1,4 @@
-import SideBar_Tradings from './SideBar_Tradings';
+import SideBar_Tradings from './SideBar_Transactions';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { noTokenRequest, withTokenRequest, requestHeaders, multipartFormData } from '../../../http';
@@ -135,8 +135,7 @@ const NewListing = () => {
             {
                 headers: multipartFormData
             }).then(() => {
-                // TODO change different url
-                navigate('/home');
+                navigate('/listingProducts');
             })
             .catch((error) => {
                 console.log(error);
@@ -159,7 +158,6 @@ const NewListing = () => {
     return (
         <div>
             <SideBar_Tradings />
-            
             <div style={mainContents}>
                 <h2>New Listing</h2>
                 <div>
