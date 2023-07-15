@@ -18,6 +18,13 @@ import ProfilePictureSettings from './components/pages/accountSettings/ProfilePi
 import SignupStaff from "./components/pages/accountSettings/SignupStaff";
 import ListingProducts from "./components/pages/transactions/ListingProducts";
 import NewListing from "./components/pages/transactions/NewListing";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const theme = createTheme({
+  typography: {
+    fontFamily: 'Century Gothic, sans-serif',
+  },
+});
 
 const Top = () => {
   return (
@@ -39,20 +46,22 @@ const Menu = () => {
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Menu />}>
-          <Route path="/home" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/profileSettings" element={<ProfileSettings />} />
-          <Route path="/profilePictureSettings" element={<ProfilePictureSettings />} />
-          <Route path="/signupStaff" element={<SignupStaff />} />
-          <Route path="/listingProducts" element={<ListingProducts />} />
-          <Route path="/newListing" element={<NewListing />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Menu />}>
+            <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/profileSettings" element={<ProfileSettings />} />
+            <Route path="/profilePictureSettings" element={<ProfilePictureSettings />} />
+            <Route path="/signupStaff" element={<SignupStaff />} />
+            <Route path="/listingProducts" element={<ListingProducts />} />
+            <Route path="/newListing" element={<NewListing />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   )
 }
 
