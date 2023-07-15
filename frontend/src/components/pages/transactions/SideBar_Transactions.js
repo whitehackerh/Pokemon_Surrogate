@@ -11,6 +11,7 @@ const SideBar_Tradings = () => {
     };
     return (
         <div style={style}>
+            <Link to="/listingProducts">Listing Products</Link><br></br><br></br>
             <Link to="/newListing">New Listing</Link><br></br><br></br>
         </div>
     );

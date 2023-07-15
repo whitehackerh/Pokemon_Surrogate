@@ -8,5 +8,5 @@ class SetListingValidator(serializers.Serializer):
     listing_title = serializers.CharField(max_length=255)
     description = serializers.CharField()
     price_negotiation = serializers.IntegerField()
-    price = serializers.IntegerField(validators=[MinValueValidator(100)])
+    price = serializers.IntegerField(validators=[MinValueValidator(1)])
     create = serializers.BooleanField()

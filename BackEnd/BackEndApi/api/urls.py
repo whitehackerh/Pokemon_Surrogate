@@ -11,6 +11,8 @@ from api.Views.SetProfilePictureView import SetProfilePictureView
 from api.Views.SetListingView import SetListingView
 from api.Views.GetGameTitlesView import GetGameTitlesView
 from api.Views.GetAvailableFeeView import GetAvailableFeeView
+from api.Views.GetListingsPersonalSummaryView import GetListingsPersonalSummaryView
+from api.Views.GetListingsPersonalView import GetListingsPersonalView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -23,5 +25,7 @@ urlpatterns = [
     path('setProfilePicture', SetProfilePictureView.as_view(), name='setProfilePicture'),
     path('setListing', SetListingView.as_view(), name='setListing'),
     path('getGameTitles', GetGameTitlesView.as_view(), name='getGameTitles'),
-    path('getAvailableFee', GetAvailableFeeView.as_view(), name='getAvailableFee')
+    path('getAvailableFee', GetAvailableFeeView.as_view(), name='getAvailableFee'),
+    path('getListingsPersonalSummary', GetListingsPersonalSummaryView.as_view(), name='getListingsPersonalSummary'),
+    path('getListingsPersonal', GetListingsPersonalView.as_view(), name='getListingsPersonal')
 ]

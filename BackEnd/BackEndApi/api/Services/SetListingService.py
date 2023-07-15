@@ -6,7 +6,7 @@ from api.Enums.ResponseCodes import ResponseCodes
 from api.Exceptions.CustomExceptions import CustomExceptions
 from api.Services.BaseService import BaseService
 from api.Services.Utils.ServiceUtils import ServiceUtils
-from api.Models.Listing import Listing
+from api.Models.Listings import Listings
 from api.Models.ListingPictures import ListingPictures
 from api.Models.Fees import Fees
 from api.Enums.Path import Path
@@ -37,13 +37,13 @@ class SetListingService(BaseService):
             'price_negotiation': request.data.get('price_negotiation'),
             'price': request.data.get('price'),
             'fee_id': feesModel.getAvailableFee().id,
-            'status': ListingStatus.SALE_AVAILABLE
+            'status': ListingStatus.SELLING
         }
-        listingModel = Listing(**listingParams)
-        listingModel.save()
+        listingsModel = Listings(**listingParams)
+        listingsModel.save()
 
         ### insert listing_pictures
-        listing_id = listingModel.id
+        listing_id = listingsModel.id
         if not request.FILES:
             listingPicturesParam = {
                 'listing_id': listing_id,
