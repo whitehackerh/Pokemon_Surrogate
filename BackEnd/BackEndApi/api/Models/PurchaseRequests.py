@@ -6,6 +6,7 @@ class PurchaseRequests(models.Model):
     buyer_id = models.IntegerField()
     price = models.IntegerField()
     status = models.IntegerField()
+    canceled_by = models.IntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 

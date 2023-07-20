@@ -75,7 +75,7 @@ const ProfilePictureSettings = () => {
                     <div className="profilePicture" style={profilePictureSettings}>
                         <img src={`data:image/jpeg;base64,${pictureBase64}`} alt="picture" style={croppedStyle}>
                         </img><br></br>
-                        <UploadButton className="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium css-sghohy-MuiButtonBase-root-MuiButton-root">SETTINGS</UploadButton>
+                        <UploadButton className="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium css-n5agiv-MuiButtonBase-root-MuiButton-root">SETTINGS</UploadButton>
                         <Button variant="contained" style={deleteButtonStyle} onClick={() => deleteProfilePicture()} disabled={defaultPicture}>DELETE</Button>
                         <br />
                         <UploadPreview

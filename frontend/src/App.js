@@ -18,6 +18,7 @@ import ProfilePictureSettings from './components/pages/accountSettings/ProfilePi
 import SignupStaff from "./components/pages/accountSettings/SignupStaff";
 import ListingProducts from "./components/pages/transactions/ListingProducts";
 import NewListing from "./components/pages/transactions/NewListing";
+import ListingDetail from "./components/modules/common/ListingDetail";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -58,6 +59,7 @@ const App = () => {
             <Route path="/signupStaff" element={<SignupStaff />} />
             <Route path="/listingProducts" element={<ListingProducts />} />
             <Route path="/newListing" element={<NewListing />} />
+            <Route path="/listingDetail" element={<ListingDetail />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const SideBar_Tradings = () => {
+const SideBar_Transactions = () => {
     const style = {
         position: 'sticky',
         width: '300px',
@@ -17,4 +17,4 @@ const SideBar_Tradings = () => {
     );
 };
 
-export default SideBar_Tradings;
+export default SideBar_Transactions;
