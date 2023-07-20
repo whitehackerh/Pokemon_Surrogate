@@ -1,6 +1,7 @@
 import base64
 import os
 from api.Enums.ListingStatus import ListingStatus
+from api.Enums.ListingCategory import ListingCategory
 
 class ServiceUtils:
     def makeDir(path):
@@ -14,7 +15,20 @@ class ServiceUtils:
             return 'in progress'
         elif code == ListingStatus.SOLD:
             return 'sold'
+    
+    def getListingCategory(code):
+        if code == ListingCategory.POKEMON:
+            return 'Pokemon'
+        elif code == ListingCategory.ITEMS:
+            return 'Items'
+        elif code == ListingCategory.SAVE_DATA:
+            return 'Save Data'
+        elif code == ListingCategory.BOOSTING:
+            return 'Boosting'
         
     def getBase64FromPath(path):
-        with open(path, 'rb') as file:
-            return base64.b64encode(file.read()).decode('utf-8')
+        if os.path.exists(path) and os.path.isfile(path):
+            with open(path, 'rb') as file:
+                return base64.b64encode(file.read()).decode('utf-8')
+        else:
+            raise FileNotFoundError(f"File not found at '{path}'.")

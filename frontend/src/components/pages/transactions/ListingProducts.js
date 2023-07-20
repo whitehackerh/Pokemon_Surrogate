@@ -1,4 +1,4 @@
-import SideBar_Tradings from './SideBar_Transactions';
+import SideBar_Transactions from './SideBar_Transactions';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { withTokenRequest, requestHeaders } from '../../../http';
@@ -11,6 +11,7 @@ import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 
 const ListingProducts = () => {
+  const navigate = useNavigate();
   const [tab, setTab] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
@@ -70,8 +71,7 @@ const ListingProducts = () => {
   }
 
   const clickListing = (listingId) => {
-    console.log(listingId);
-    // TODO navigation
+    navigate('/listingDetail', { state: {listingId: listingId, from: 'listingProducts'}})
   }
 
   const mainContents = {
@@ -164,7 +164,7 @@ const ListingProducts = () => {
   }
   return (
     <>
-      <SideBar_Tradings />
+      <SideBar_Transactions />
       <div style={mainContents}>
         <Tabs value={tab} onChange={changeTab}>
           <Tab label="Exhibiting" />

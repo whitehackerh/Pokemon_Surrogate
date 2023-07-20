@@ -14,3 +14,9 @@ class ListingPictures(models.Model):
     class Meta:
         app_label = 'api'
         db_table = 'listing_pictures'
+
+    def getListingPictures(self, listing_id):
+        try:
+            return ListingPictures.objects.filter(listing_id=listing_id, deleted_at__isnull=True).order_by('sort_no')
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)

@@ -63,3 +63,28 @@ class Listings(models.Model):
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
         
+    def getListingDetail(self, listing_id):
+        try:
+            from api.models import Users
+            queryset = Listings.objects.filter(
+                id = listing_id
+            ).annotate(
+                game_title=Subquery(
+                    GameTitles.objects.filter(
+                        id=OuterRef('game_title_id')
+                    ).values('title')[:1]
+                ),
+                nickname=Subquery(
+                    Users.objects.filter(
+                        id=OuterRef('seller_id')
+                    ).values('nickname')[:1]
+                ),
+                sellers_profile_picture=Subquery(
+                    Users.objects.filter(
+                        id=OuterRef('seller_id')
+                    ).values('profile_picture')[:1]
+                )
+            )
+            return queryset.all()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
