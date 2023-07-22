@@ -3,6 +3,7 @@ from api.Enums.ResponseCodes import ResponseCodes
 from api.Exceptions.CustomExceptions import CustomExceptions
 from api.Models.ListingPictures import ListingPictures
 from api.Models.GameTitles import GameTitles
+from api.Models.Fees import Fees
 from django.db.models import Subquery, OuterRef
 
 class Listings(models.Model):
@@ -83,8 +84,26 @@ class Listings(models.Model):
                     Users.objects.filter(
                         id=OuterRef('seller_id')
                     ).values('profile_picture')[:1]
+                ),
+                fee_percentage=Subquery(
+                    Fees.objects.filter(
+                        id=OuterRef('fee_id')
+                    ).values('percentage')[:1]
                 )
             )
             return queryset.all()
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def updateListing(self, request):
+        try:
+            listing = Listings.objects.get(id=request.data.get('listing_id'))
+            listing.game_title_id = request.data.get('game_title_id')
+            listing.category = request.data.get('category')
+            listing.listing_title = request.data.get('listing_title')
+            listing.description = request.data.get('description')
+            listing.price_negotiation = request.data.get('price_negotiation')
+            listing.price = request.data.get('price')
+            listing.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)

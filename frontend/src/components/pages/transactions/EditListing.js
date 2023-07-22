@@ -1,6 +1,6 @@
 import SideBar_Tradings from './SideBar_Transactions';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { noTokenRequest, withTokenRequest, requestHeaders, multipartFormData } from '../../../http';
 import TextField from "@mui/material/TextField";
 import Autocomplete from '@mui/material/Autocomplete';
@@ -17,7 +17,9 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const NewListing = () => {
+const EditListing = () => {
+    const location = useLocation();
+    const listingId = location.state ? location.state.listingId : null;
     const navigate = useNavigate();
     const [pictures, setPictures] = useState([]);
     const [game_title, setGameTitle] = useState(null);
@@ -31,12 +33,18 @@ const NewListing = () => {
     const [price_negotiation, setPriceNegotiation] = useState(0);
     const [gameTitles, setGameTitles] = useState(null);
     const [availableFee, setAvailableFee] = useState(null);
+    const [pageTitle, setPageTitle] = useState('New Listing');
+    const [registerButtonText, setRegisterButtonText] = useState('Register');
     requestHeaders.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
     multipartFormData.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
 
     useEffect(() => {
         getGameTitles();
-        getAvailableFee();
+        if (listingId) {
+            getListingDetail();
+        } else {
+            getAvailableFee();
+        }
     }, []);
 
     useEffect(() => {
@@ -62,6 +70,44 @@ const NewListing = () => {
         })
     }
 
+    function getListingDetail() {
+        noTokenRequest.post('/getListingDetail', {
+            listing_id: listingId,
+            user_id: localStorage.getItem('user_id') ? localStorage.getItem('user_id') : null
+        }).then((res) => {
+            const data = res.data.data;
+            if (!data.isDefaultPicture) {
+                const pictureFiles = data.pictures.map(base64Data => {
+                    const blob = dataURLtoBlob(base64Data);
+                    const file = new File([blob], 'picture.png', { type: 'image/png' });
+                    const dataUrl = URL.createObjectURL(file);
+                    return { file, url: dataUrl };
+                });
+                setPictures(pictureFiles);
+            }
+            setGameTitle({ id: data.game_title_id, title: data.game_title });
+            setCategory(data.category_id);
+            setListingTitle(data.listing_title);
+            setDescription(data.description);
+            setPrice(data.price);
+            setPriceNegotiation(data.price_negotiation);
+            setPriceNegotiationChecked(data.price_negotiation);
+            setAvailableFee({id: data.fee_id, percentage: data.fee_percentage});
+            setPageTitle('Edit Listing');
+            setRegisterButtonText('Update');
+        })
+    }
+
+    function dataURLtoBlob(base64Data) {
+        const byteString = atob(base64Data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < byteString.length; i++) {
+          uint8Array[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([uint8Array], { type: 'image/png' });
+    }
+      
     function getAvailableFee() {
         noTokenRequest.get('/getAvailableFee', {
         }).then((res) => {
@@ -123,6 +169,7 @@ const NewListing = () => {
         pictures.forEach((picture, index) => {
             formData.append(`picture${index + 1}`, picture.file);
         });
+        formData.append('listing_id', listingId ? listingId : '');
         formData.append('seller_id', localStorage.getItem('user_id'));
         formData.append('game_title_id', game_title.id);
         formData.append('category', category);
@@ -130,7 +177,6 @@ const NewListing = () => {
         formData.append('description', description);
         formData.append('price_negotiation', price_negotiation);
         formData.append('price', price);
-        formData.append('create', true);
         withTokenRequest.post('/setListing', formData,
             {
                 headers: multipartFormData
@@ -159,7 +205,7 @@ const NewListing = () => {
         <div>
             <SideBar_Tradings />
             <div style={mainContents}>
-                <h2>New Listing</h2>
+                <h2>{pageTitle}</h2>
                 <div>
                 <label htmlFor="upload-input">
                     <input
@@ -196,13 +242,15 @@ const NewListing = () => {
                 </div><br /><br />
                 <Autocomplete
                     id="gameTitle"
-                    defaultValue={null}
+                    value={game_title}
                     options={gameTitles}
                     getOptionLabel={(option) => option.title}
                     sx={{ width: 450 }}
                     renderInput={(params) => <TextField {...params} label='Game Title' />}
-                    onChange={(event, newValue) => {handleChange(event, newValue, 'setGameTitle', null);}}>
-                </Autocomplete><br /><br />
+                    onChange={(event, newValue) => {handleChange(event, newValue, 'setGameTitle', null);}}
+                    getOptionSelected={(option, value) => option.id === value.id}
+                />
+                <br /><br />
                 <FormControl component='fieldset'>
                     <FormLabel component='legend'>Category</FormLabel>
                     <RadioGroup value={category} onChange={(event, newValue) => {handleChange(event, newValue, 'setCategory', null);}} row>
@@ -270,10 +318,10 @@ const NewListing = () => {
                 />
                 
                 <br /><br /><br /><br />
-                <Button variant="contained" onClick={setListing}>Register</Button>
+                <Button variant="contained" onClick={setListing}>{registerButtonText}</Button>
             </div>
         </div>
     )
 }
 
-export default NewListing;
+export default EditListing;

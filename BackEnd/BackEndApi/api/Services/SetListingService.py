@@ -16,10 +16,10 @@ class SetListingService(BaseService):
     @transaction.atomic
     def service(self, request):
         try:
-            if request.data.get('create'):
-                self.__createListing(request)
-            else:
+            if request.data.get('listing_id'):
                 self.__updateListing(request)
+            else:
+                self.__createListing(request)
             return None
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
@@ -45,15 +45,7 @@ class SetListingService(BaseService):
         ### insert listing_pictures
         listing_id = listingsModel.id
         if not request.FILES:
-            listingPicturesParam = {
-                'listing_id': listing_id,
-                'seller_id': seller_id,
-                'path': Path.LOGO,
-                'sort_no': 1
-            }
-            listingPictureModel = ListingPictures(**listingPicturesParam)
-            listingPictureModel.save()
-            return None
+            self.__registerDefaultPicture(listing_id, seller_id)
         else:
             ServiceUtils.makeDir(os.path.join(settings.MEDIA_ROOT, Path.LISTING_PICTURE_DIR))
             listingPicturesParams = []
@@ -74,7 +66,67 @@ class SetListingService(BaseService):
                 with open(os.path.join(settings.MEDIA_ROOT, listingPicturesParam['path']), 'wb') as f:
                     for chunk in request.FILES.get(f"picture{listingPicturesParam['sort_no']}").chunks():
                         f.write(chunk)
-            return None
+        return None
     
     def __updateListing(self, request):
+        listing_id = request.data.get('listing_id')
+        seller_id = request.data.get('seller_id')
+        listingModel = Listings()
+        record = listingModel.getListingDetail(listing_id)
+        if record.count() == 1 and record[0].seller_id == int(seller_id) and record[0].status == ListingStatus.SELLING:
+            listingModel.updateListing(request)
+            listingPicturesModel = ListingPictures()
+            oldListingPictures = listingPicturesModel.getListingPictures(listing_id)
+            
+            # stash file path
+            oldPicturePaths = []
+            for oldPicture in oldListingPictures:
+                oldPicturePaths.append(oldPicture.path)
+            
+            listingPicturesModel.deleteListingPictures(listing_id)
+
+            if not request.FILES:
+                self.__registerDefaultPicture(listing_id, seller_id)
+            else:
+                ServiceUtils.makeDir(os.path.join(settings.MEDIA_ROOT, Path.LISTING_PICTURE_DIR))
+                listingPicturesParams = []
+                pictureNameList = []
+                for oldPicture in oldPicturePaths:
+                    pictureNameList.append(os.path.basename(oldPicture))
+                for index in range(1, 11):
+                    if f'picture{index}' in request.FILES:
+                        ### filename: {listing_id}_{uuid}.png
+                        filename = f'{listing_id}_{uuid.uuid4().hex}.png'
+                        while any(filename == pictureName for pictureName in pictureNameList):
+                            filename = f'{listing_id}_{uuid.uuid4().hex}.png'
+                        listingPicturesParams.append({
+                            'listing_id': listing_id,
+                            'seller_id': seller_id,
+                            'path': os.path.join(Path.LISTING_PICTURE_DIR, filename),
+                            'sort_no': index
+                        })
+                        pictureNameList.append(filename)
+                ListingPictures.objects.bulk_create([ListingPictures(**listingPicturesParam) for listingPicturesParam in listingPicturesParams])
+                for listingPicturesParam in listingPicturesParams:
+                    with open(os.path.join(settings.MEDIA_ROOT, listingPicturesParam['path']), 'wb') as f:
+                        for chunk in request.FILES.get(f"picture{listingPicturesParam['sort_no']}").chunks():
+                            f.write(chunk)
+
+            # delete old pictures
+            for oldPicture in oldPicturePaths:
+                targetPath = os.path.join(settings.MEDIA_ROOT, oldPicture)
+                if os.path.exists(targetPath) and oldPicture != Path.LOGO:
+                    os.remove(targetPath)
+        else:
+            raise CustomExceptions('Unauthorized Error.', ResponseCodes.INTERNAL_SERVER_ERROR)
         return None
+    
+    def __registerDefaultPicture(self, listing_id, seller_id):
+        listingPicturesParam = {
+            'listing_id': listing_id,
+            'seller_id': seller_id,
+            'path': Path.LOGO,
+            'sort_no': 1
+        }
+        listingPictureModel = ListingPictures(**listingPicturesParam)
+        listingPictureModel.save()

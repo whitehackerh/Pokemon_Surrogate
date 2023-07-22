@@ -9,8 +9,8 @@ import { Table, TableBody, TableCell, TableRow, TableContainer, Paper } from '@m
 const ListingDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [listingId, setListingId] = useState(location.state.listingId);
-    const [from, setFrom] = useState(location.state.from);
+    const listingId = location.state.listingId;
+    const from = location.state.from;
     const [pictures, setPictures] = useState([]);
     const [record, setRecord] = useState(null);
 
@@ -39,9 +39,15 @@ const ListingDetail = () => {
                 listing_title: data.listing_title,
                 description: data.description.split('\n'),
                 price_negotiation: data.price_negotiation,
-                price: data.price
-            })
+                price: data.price,
+                fee_id: data.fee_id,
+                fee_percentage: data.fee_percentage
+            });
         })
+    }
+
+    function clickEdit() {
+        navigate('/editListing', { state: {listingId: listingId}});
     }
 
     const mainContents = {
@@ -78,12 +84,25 @@ const ListingDetail = () => {
     if (record.edit_available) {
         buttons = <>
          {/* TODO Navigation */}
-            <Button variant="contained">Edit</Button>
+            <Button variant="contained" onClick={clickEdit}>Edit</Button>
         </>
     } else if (record.enable_purchase) {
         buttons = <>
         {/* TODO Navigation */}
             <Button variant="contained">Go to purchase procedure</Button>
+        </>
+    }
+    let fees = '';
+    if (localStorage.getItem('user_id') == record.seller_id) {
+        fees = <>
+            <TableRow>
+               <TableCell style={keyColumnStyle}>Fee ({record.fee_percentage * 100}%)</TableCell>
+               <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>${record.price * record.fee_percentage}</TableCell>
+            </TableRow>
+            <TableRow>
+               <TableCell style={keyColumnStyle}>Revenue</TableCell>
+               <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>${record.price - record.price * record.fee_percentage}</TableCell>
+            </TableRow>
         </>
     }
 
@@ -123,10 +142,12 @@ const ListingDetail = () => {
                                 <TableCell style={keyColumnStyle}>Price</TableCell>
                                 <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>${record.price}</TableCell>
                             </TableRow>
+                            {fees}
                             <TableRow>
                                 <TableCell style={keyColumnStyle}>Price Negotiation</TableCell>
                                 <TableCell>{record.price_negotiation ? 'OK' : 'NG'}</TableCell>
                             </TableRow>
+ 
                         </TableBody>
                     </Table>
                 </TableContainer>

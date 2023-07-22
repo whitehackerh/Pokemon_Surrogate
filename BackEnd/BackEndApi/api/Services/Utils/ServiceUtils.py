@@ -18,7 +18,7 @@ class ServiceUtils:
     
     def getListingCategory(code):
         if code == ListingCategory.POKEMON:
-            return 'Pokemon'
+            return 'Pokémon'
         elif code == ListingCategory.ITEMS:
             return 'Items'
         elif code == ListingCategory.SAVE_DATA:
