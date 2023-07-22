@@ -17,7 +17,7 @@ import ProfileSettings from "./components/pages/accountSettings/ProfileSettings"
 import ProfilePictureSettings from './components/pages/accountSettings/ProfilePictureSettings';
 import SignupStaff from "./components/pages/accountSettings/SignupStaff";
 import ListingProducts from "./components/pages/transactions/ListingProducts";
-import NewListing from "./components/pages/transactions/NewListing";
+import EditListing from "./components/pages/transactions/EditListing";
 import ListingDetail from "./components/modules/common/ListingDetail";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
@@ -58,7 +58,7 @@ const App = () => {
             <Route path="/profilePictureSettings" element={<ProfilePictureSettings />} />
             <Route path="/signupStaff" element={<SignupStaff />} />
             <Route path="/listingProducts" element={<ListingProducts />} />
-            <Route path="/newListing" element={<NewListing />} />
+            <Route path="/editListing" element={<EditListing />} />
             <Route path="/listingDetail" element={<ListingDetail />} />
           </Route>
         </Routes>
