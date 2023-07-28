@@ -10,7 +10,8 @@ const HomeBar = () => {
 
   const homeBarContentStyle = {
     fontSize: '20px',
-    fontFamily: 'Century Gothic'
+    fontFamily: 'Century Gothic',
+    color: 'white'
   };
 
   return (

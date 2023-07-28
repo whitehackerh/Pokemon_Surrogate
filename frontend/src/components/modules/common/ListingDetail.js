@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import SideBar_Transactions from '../../pages/transactions/SideBar_Transactions';
 import CustomSlider from "../CustomSlider/CustomSlider";
 import { Table, TableBody, TableCell, TableRow, TableContainer, Paper } from '@mui/material';
+import ConfirmDialog from "../../modules/dialogs/ConfirmDialog";
 
 const ListingDetail = () => {
     const navigate = useNavigate();
@@ -13,6 +14,7 @@ const ListingDetail = () => {
     const from = location.state.from;
     const [pictures, setPictures] = useState([]);
     const [record, setRecord] = useState(null);
+    requestHeaders.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
 
     useEffect(() => {
         getListingDetail();
@@ -50,9 +52,21 @@ const ListingDetail = () => {
         navigate('/editListing', { state: {listingId: listingId}});
     }
 
+    function removeListing() {
+        withTokenRequest.post('/removeListing', {
+            listing_id: listingId,
+            seller_id: record.seller_id
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getListingDetail();
+        })
+    }
+
     const mainContents = {
         float: 'left',
         margin: '10px',
+        marginLeft: from == 'listingProducts' ? '10px' : '500px',
         // 'text-align': 'center',
         width: 'calc(100% - 362px)'
     }
@@ -83,8 +97,11 @@ const ListingDetail = () => {
     let buttons = '';
     if (record.edit_available) {
         buttons = <>
-         {/* TODO Navigation */}
-            <Button variant="contained" onClick={clickEdit}>Edit</Button>
+            <div style={{display: 'flex'}}>
+                <Button variant="contained" onClick={clickEdit}>Edit</Button>&nbsp;&nbsp;&nbsp;&nbsp;
+                <br /><br />
+                <ConfirmDialog text='remove' message='Are you sure you want to remove this listing?' callback={removeListing}/>
+            </div>
         </>
     } else if (record.enable_purchase) {
         buttons = <>
@@ -156,7 +173,7 @@ const ListingDetail = () => {
                 <div style={{border: '1px solid black', height: '50px', width: '30%', display: 'flex'}}>
                     <img src={`data:image/jpeg;base64,${record.profile_picture}`} style={profilePictureStyle}></img>
                     <div style={{fontWeight: 'bold'}}>&nbsp;{record.nickname}</div>
-                </div><br />
+                </div><br /><br />
                 {buttons}
             </div>
         </>
