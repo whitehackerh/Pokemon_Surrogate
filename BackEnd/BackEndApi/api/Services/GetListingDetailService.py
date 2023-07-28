@@ -14,13 +14,12 @@ class GetListingDetailService(BaseService):
         try:
             data = {}
             listing_id = request.get('listing_id')
-            user_id = request.get('user_id')
             listingsModel = Listings()
             listingPicturesModel = ListingPictures()
             listings = listingsModel.getListingDetail(listing_id)
             listingPictures = listingPicturesModel.getListingPictures(listing_id)
             if listings.count() == 1:
-                data = self.__formatResponseData(int(user_id), listing_id, listings[0], listingPictures)
+                data = self.__formatResponseData(request.get('user_id'), listing_id, listings[0], listingPictures)
             else:
                 data = None
             return data
@@ -28,6 +27,8 @@ class GetListingDetailService(BaseService):
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
         
     def __formatResponseData(self, user_id, listing_id, listings, listingPictures):
+        if user_id:
+            user_id = int(user_id)
         data = {}
         data['listing_id'] = listing_id
         data['seller_id'] = listings.seller_id
