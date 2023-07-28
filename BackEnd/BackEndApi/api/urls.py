@@ -14,6 +14,8 @@ from api.Views.GetAvailableFeeView import GetAvailableFeeView
 from api.Views.GetListingsPersonalSummaryView import GetListingsPersonalSummaryView
 from api.Views.GetListingsPersonalView import GetListingsPersonalView
 from api.Views.GetListingDetailView import GetListingDetailView
+from api.Views.GetListingsPublicSummaryView import GetListingsPublicSummaryView
+from api.Views.GetListingsPublicView import GetListingsPublicView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -29,5 +31,7 @@ urlpatterns = [
     path('getAvailableFee', GetAvailableFeeView.as_view(), name='getAvailableFee'),
     path('getListingsPersonalSummary', GetListingsPersonalSummaryView.as_view(), name='getListingsPersonalSummary'),
     path('getListingsPersonal', GetListingsPersonalView.as_view(), name='getListingsPersonal'),
-    path('getListingDetail', GetListingDetailView.as_view(), name='getListingDetail')
+    path('getListingDetail', GetListingDetailView.as_view(), name='getListingDetail'),
+    path('getListingsPublicSummary', GetListingsPublicSummaryView.as_view(), name='getListingsPublicSummary'),
+    path('getListingsPublic', GetListingsPublicView.as_view(), name='getListingsPublic')
 ]

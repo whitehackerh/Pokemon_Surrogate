@@ -2,10 +2,8 @@ import SideBar_Transactions from './SideBar_Transactions';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { withTokenRequest, requestHeaders } from '../../../http';
-import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
@@ -128,7 +126,7 @@ const ListingProducts = () => {
     color: 'red',
     fontWeight: 'bold',
     fontSize: '25px',
-    whiteSpace: 'nowrap', // 追加
+    whiteSpace: 'nowrap'
   };
 
   const notTransactions = (listingsPersonal) => (

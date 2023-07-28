@@ -1,5 +1,6 @@
 from django.db import models
 from api.Enums.ResponseCodes import ResponseCodes
+from api.Enums.ListingStatus import ListingStatus
 from api.Exceptions.CustomExceptions import CustomExceptions
 from api.Models.ListingPictures import ListingPictures
 from api.Models.GameTitles import GameTitles
@@ -107,3 +108,38 @@ class Listings(models.Model):
             listing.save()
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def getListingsPublicRecordsCount(self):
+        try:
+            return Listings.objects.filter(status=ListingStatus.SELLING).count()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def getListingsPublic(self, offset, limit):
+        try:
+            queryset = Listings.objects.filter(
+                status = ListingStatus.SELLING
+            ).annotate(
+                smallest_sort_no=Subquery(
+                    ListingPictures.objects.filter(
+                        listing_id=OuterRef('id'),
+                        deleted_at__isnull=True
+                    ).order_by('sort_no').values('sort_no')[:1]
+                ),
+                path=Subquery(
+                    ListingPictures.objects.filter(
+                        listing_id=OuterRef('id'),
+                        sort_no=OuterRef('smallest_sort_no'),
+                        deleted_at__isnull=True
+                    ).values('path')[:1]
+                ),
+                game_title=Subquery(
+                    GameTitles.objects.filter(
+                        id=OuterRef('game_title_id')
+                    ).values('title')[:1]
+                ),
+
+            ).order_by('-id')[offset:offset+limit]
+            return queryset.all()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
