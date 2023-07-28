@@ -24,18 +24,59 @@ class Listings(models.Model):
         app_label = 'api'
         db_table = 'listings'
 
-    def getListingsPersonalRecordsCount(self, seller_id, status):
+    def getListingsPersonalSellingRecordsCount(self, seller_id, status):
         try:
             return Listings.objects.filter(seller_id=seller_id, status=status).count()
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
         
-    def getListingsPersonal(self, seller_id, status, offset, limit):
+    def getListingsPersonalSoldRemovedRecordsCount(self, seller_id, statuses):
+        try:
+            return Listings.objects.filter(seller_id=seller_id, status__in=statuses).count()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def getListingsPersonalSelling(self, seller_id, status, offset, limit):
         try:
             from api.models import Users
             queryset = Listings.objects.filter(
                 seller_id=seller_id,
                 status = status
+            ).annotate(
+                smallest_sort_no=Subquery(
+                    ListingPictures.objects.filter(
+                        listing_id=OuterRef('id'),
+                        deleted_at__isnull=True
+                    ).order_by('sort_no').values('sort_no')[:1]
+                ),
+                path=Subquery(
+                    ListingPictures.objects.filter(
+                        listing_id=OuterRef('id'),
+                        sort_no=OuterRef('smallest_sort_no'),
+                        deleted_at__isnull=True
+                    ).values('path')[:1]
+                ),
+                game_title=Subquery(
+                    GameTitles.objects.filter(
+                        id=OuterRef('game_title_id')
+                    ).values('title')[:1]
+                ),
+                nickname=Subquery(
+                    Users.objects.filter(
+                        id=seller_id
+                    ).values('nickname')[:1]
+                )
+            ).order_by('-id')[offset:offset+limit]
+            return queryset.all()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+    
+    def getListingsPersonalSoldRemoved(self, seller_id, statuses, offset, limit):
+        try:
+            from api.models import Users
+            queryset = Listings.objects.filter(
+                seller_id=seller_id,
+                status__in=statuses
             ).annotate(
                 smallest_sort_no=Subquery(
                     ListingPictures.objects.filter(
@@ -143,3 +184,11 @@ class Listings(models.Model):
             return queryset.all()
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+    
+    def removeListing(self, listing_id):
+        try:
+            listing = Listings.objects.get(id=listing_id)
+            listing.status = ListingStatus.REMOVED
+            listing.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)

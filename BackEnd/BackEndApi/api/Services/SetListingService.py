@@ -72,8 +72,7 @@ class SetListingService(BaseService):
         listing_id = request.data.get('listing_id')
         seller_id = request.data.get('seller_id')
         listingModel = Listings()
-        record = listingModel.getListingDetail(listing_id)
-        if record.count() == 1 and record[0].seller_id == int(seller_id) and record[0].status == ListingStatus.SELLING:
+        if ServiceUtils.isEnableUpdateListing(listing_id, seller_id):
             listingModel.updateListing(request)
             listingPicturesModel = ListingPictures()
             oldListingPictures = listingPicturesModel.getListingPictures(listing_id)

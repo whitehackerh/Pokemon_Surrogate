@@ -1,6 +1,7 @@
 import os
 from django.conf import settings
 from api.Enums.ResponseCodes import ResponseCodes
+from api.Enums.ListingStatus import ListingStatus
 from api.Exceptions.CustomExceptions import CustomExceptions
 from api.Services.BaseService import BaseService
 from api.Services.Utils.ServiceUtils import ServiceUtils
@@ -10,18 +11,23 @@ class GetListingsPersonalService(BaseService):
     def service(self, request):
         try:
             data = {}
-            listingsModel = Listings()
+            seller_id = request.get('seller_id')
+            status = request.get('status')
+            model = Listings()
             page = request.get('page')
             limit = 10
             offset = 0
-            if (page > 1):
+            if page > 1:
                 # 10 records / page
                 offset = ((page - 1) * limit)
-            records = listingsModel.getListingsPersonal(request.get('seller_id'), request.get('status'), offset, limit)
+            records = None
+            if status == ListingStatus.SELLING:
+                records = model.getListingsPersonalSelling(seller_id, status, offset, limit)
+            elif status == ListingStatus.SOLD:
+                records = model.getListingsPersonalSoldRemoved(seller_id, [status, ListingStatus.REMOVED], offset, limit)
             if not records:
                 data['listings'] = []
                 return data
-            
             data = self.__formatResponseData(records)
             return data
         except Exception as e:

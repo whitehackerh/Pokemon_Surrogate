@@ -2,6 +2,7 @@ import base64
 import os
 from api.Enums.ListingStatus import ListingStatus
 from api.Enums.ListingCategory import ListingCategory
+from api.Models.Listings import Listings
 
 class ServiceUtils:
     def makeDir(path):
@@ -15,6 +16,8 @@ class ServiceUtils:
             return 'in progress'
         elif code == ListingStatus.SOLD:
             return 'sold'
+        elif code == ListingStatus.REMOVED:
+            return 'removed'
     
     def getListingCategory(code):
         if code == ListingCategory.POKEMON:
@@ -32,3 +35,8 @@ class ServiceUtils:
                 return base64.b64encode(file.read()).decode('utf-8')
         else:
             raise FileNotFoundError(f"File not found at '{path}'.")
+    
+    def isEnableUpdateListing(listing_id, seller_id):
+        model = Listings()
+        record = model.getListingDetail(listing_id)
+        return record.count() == 1 and record[0].seller_id == int(seller_id) and record[0].status == ListingStatus.SELLING
