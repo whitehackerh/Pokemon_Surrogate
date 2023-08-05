@@ -17,6 +17,7 @@ from api.Views.GetListingDetailView import GetListingDetailView
 from api.Views.GetListingsPublicSummaryView import GetListingsPublicSummaryView
 from api.Views.GetListingsPublicView import GetListingsPublicView
 from api.Views.RemoveListingView import RemoveListingView
+from api.Views.SetPurchaseRequestView import SetPurchaseRequestView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -35,5 +36,6 @@ urlpatterns = [
     path('getListingDetail', GetListingDetailView.as_view(), name='getListingDetail'),
     path('getListingsPublicSummary', GetListingsPublicSummaryView.as_view(), name='getListingsPublicSummary'),
     path('getListingsPublic', GetListingsPublicView.as_view(), name='getListingsPublic'),
-    path('removeListing', RemoveListingView.as_view(), name='removeListing')
+    path('removeListing', RemoveListingView.as_view(), name='removeListing'),
+    path('setPurchaseRequest', SetPurchaseRequestView.as_view(), name='setPurchaseRequest')
 ]

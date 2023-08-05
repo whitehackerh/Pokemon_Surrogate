@@ -36,7 +36,7 @@ class GetListingDetailService(BaseService):
         data['nickname'] = listings.nickname
         data['status'] = listings.status
         data['edit_available'] = data['seller_id'] == user_id and data['status'] == ListingStatus.SELLING
-        data['enable_purchase'] = data['seller_id'] != user_id and data['status'] == ListingStatus.SELLING
+        data['enable_purchase'] = user_id != None and data['seller_id'] != user_id and data['status'] == ListingStatus.SELLING
         data['game_title_id'] = listings.game_title_id
         data['game_title'] = listings.game_title
         data['category_id'] = listings.category

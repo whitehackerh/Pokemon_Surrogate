@@ -149,7 +149,15 @@ class Listings(models.Model):
             listing.save()
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
-        
+    
+    def updateListingStatus(self, listing_id, status):
+        try:
+            listing = Listings.objects.get(id=listing_id)
+            listing.status = status
+            listing.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+
     def getListingsPublicRecordsCount(self):
         try:
             return Listings.objects.filter(status=ListingStatus.SELLING).count()

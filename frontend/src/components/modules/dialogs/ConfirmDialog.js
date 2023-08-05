@@ -29,7 +29,7 @@ export default function ConfirmDialog(props) {
 
   return (
     <div>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <Button size="large" variant="contained" onClick={handleClickOpen}>
         {props.text}
       </Button>
       <Dialog
