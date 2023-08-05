@@ -63,6 +63,18 @@ const ListingDetail = () => {
         })
     }
 
+    function setPurchaseRequest() {
+        withTokenRequest.post('/setPurchaseRequest', {
+            listing_id: listingId,
+            buyer_id: localStorage.getItem('user_id')
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            // TODO navigation
+            navigate('/home');
+        })
+    }
+
     const mainContents = {
         float: 'left',
         margin: '10px',
@@ -105,8 +117,7 @@ const ListingDetail = () => {
         </>
     } else if (record.enable_purchase) {
         buttons = <>
-        {/* TODO Navigation */}
-            <Button variant="contained">Go to purchase procedure</Button>
+            <ConfirmDialog text='Go to purchase procedure' message='Are you sure you want to purchase procedure?' callback={setPurchaseRequest}/>
         </>
     }
     let fees = '';
