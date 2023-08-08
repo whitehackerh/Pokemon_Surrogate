@@ -46,8 +46,8 @@ export default function ConfirmDialog(props) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleOK} variant='contained'>Agree</Button>
+          <Button onClick={handleClose}>CANCEL</Button>
+          <Button onClick={handleOK} variant='contained'>OK</Button>
         </DialogActions>
       </Dialog>
     </div>

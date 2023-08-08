@@ -187,7 +187,6 @@ class Listings(models.Model):
                         id=OuterRef('game_title_id')
                     ).values('title')[:1]
                 ),
-
             ).order_by('-id')[offset:offset+limit]
             return queryset.all()
         except Exception as e:

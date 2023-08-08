@@ -1,3 +1,4 @@
 class ResponseCodes:
     VALIDATION_ERROR = 200
+    INVALID_DATA = 300
     INTERNAL_SERVER_ERROR = 500
