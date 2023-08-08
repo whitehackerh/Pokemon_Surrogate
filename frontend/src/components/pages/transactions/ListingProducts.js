@@ -15,6 +15,8 @@ const ListingProducts = () => {
   const [page, setPage] = useState(1);
   const [listingStatus, setListingStatus] = useState(0);
   const [listingsPersonal, setListingsPersonal] = useState(null);
+  const [purchaseRequestStatus, setPurchaseRequestStatus] = useState(null);
+  const [purchaseRequests, setPurchaseRequests] = useState(null);
   requestHeaders.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
 
   useEffect(() => {
@@ -52,12 +54,53 @@ const ListingProducts = () => {
       });
   }
 
+  function loadListingsProductsTransaction(page, status) {
+    setPurchaseRequestStatus(status);
+    getPurchaseRequestsSummary(status);
+    getPurchaseRequests(page, status);
+  }
+  function getPurchaseRequestsSummary(status) {
+    withTokenRequest.post('/getPurchaseRequestsSummary', {
+      status: status,
+      seller_id: localStorage.getItem('user_id'),
+      buyer_id: null
+    }, {
+      headers: requestHeaders
+    })
+    .then((res) => {
+      setTotalPages(res.data.data.pages);
+    });
+  }
+  function getPurchaseRequests(page, status) {
+    withTokenRequest.post('/getPurchaseRequests', {
+      status: status,
+      seller_id: localStorage.getItem('user_id'),
+      buyer_id: null,
+      page: page
+    }, {
+      headers: requestHeaders
+    })
+    .then((res) => {
+      setPurchaseRequests(res.data.data.purchaseRequests);
+    });
+  }
+
   function changeTab(event, value) {
     setTab(value);
+    setPage(1);
     setListingsPersonal(null);
+    setPurchaseRequests(null);
     if (value === 0) {
+      setPurchaseRequestStatus(null);
       loadListingsProductsNotTransaction(1, 0);
-    } else if (value === 1) {
+    } else if (value == 1) {
+      setListingStatus(null);
+      loadListingsProductsTransaction(1, 0);
+    } else if (value == 2) {
+      setListingStatus(null);
+      loadListingsProductsTransaction(1, 3);
+    } else if (value === 3) {
+      setPurchaseRequestStatus(null);
       loadListingsProductsNotTransaction(1, 2);
     }
   }
@@ -65,11 +108,21 @@ const ListingProducts = () => {
   function movePage(event, value) {
     setPage(value);
     setListingsPersonal(null);
-    loadListingsProductsNotTransaction(value, listingStatus);
+    setPurchaseRequests(null);
+    if (listingStatus != null) {
+      loadListingsProductsNotTransaction(value, listingStatus);
+    } else if (purchaseRequestStatus != null) {
+      loadListingsProductsTransaction(value, purchaseRequestStatus);
+    }
   }
 
   const clickListing = (listingId) => {
     navigate('/listingDetail', { state: {listingId: listingId, from: 'listingProducts'}})
+  }
+
+  const clickPurchaseRequest = (purchaseRequestId) => {
+    // TODO Navigate
+    navigate('/home');
   }
 
   const mainContents = {
@@ -157,7 +210,35 @@ const ListingProducts = () => {
         </>
   );
 
-  if (listingsPersonal === null) {
+  const transactions = (purchaseRequests) => (
+    <>
+      {purchaseRequests.map((purchaseRequest, index) => (
+        <div key={purchaseRequest.purchase_request_id} style={parentFlameStyle}
+             onClick={() => clickPurchaseRequest(purchaseRequest.purchase_request_id)}>
+            <div style={childFlameStyle}>
+                <div style={containerStyle}>
+                    <div style={imageContainerStyle}>
+                        <img
+                          src={`data:image/jpeg;base64,${purchaseRequest.picture}`}
+                          alt="picture"
+                          style={pictureStyle}
+                        ></img>
+                    </div>
+                </div>
+                <div style={listingMainStyle}>
+                    <h4 style={{ margin: 0 }}>{purchaseRequest.listing_title}</h4>
+                    <div style={gameTitleStyle}>
+                        <h5 style={{ margin: 0 }}>{purchaseRequest.game_title}</h5>
+                    </div>
+                </div>
+                <div style={priceStyle}>${purchaseRequest.price}</div>
+            </div>
+        </div>
+      ))}
+    </>
+  );
+
+  if ((listingStatus != null && !listingsPersonal) || (purchaseRequestStatus != null && !purchaseRequests)) {
     return <></>;
   }
   return (
@@ -166,6 +247,8 @@ const ListingProducts = () => {
       <div style={mainContents}>
         <Tabs value={tab} onChange={changeTab}>
           <Tab label="Exhibiting" />
+          <Tab label='During Trading' />
+          <Tab label='Completion / Cancel' />
           <Tab label="End of Listing" />
         </Tabs>
         {tab === 0 && (
@@ -175,6 +258,18 @@ const ListingProducts = () => {
           </Box>
         )}
         {tab === 1 && (
+          <Box>
+            <br /><br />
+            {purchaseRequests ? (transactions(purchaseRequests)) : null}
+          </Box>
+        )}
+        {tab === 2 && (
+          <Box>
+            <br /><br />
+            {purchaseRequests ? (transactions(purchaseRequests)) : null}
+          </Box>
+        )}
+        {tab === 3 && (
           <Box>
             <br /><br />
             {listingsPersonal ? (notTransactions(listingsPersonal)) : null}
