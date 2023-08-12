@@ -14,8 +14,8 @@ class GetPurchaseRequestsSummaryService(BaseService):
             buyer_id = request.get('buyer_id')
             count = 0
             statuses = []
-            if status <= PurchaseRequestStatus.AWAITING_DELIVERY:
-                statuses = [PurchaseRequestStatus.PRICE_NEGOTIATION, PurchaseRequestStatus.AWAITING_PAYMENT, PurchaseRequestStatus.AWAITING_DELIVERY]
+            if status <= PurchaseRequestStatus.DELIVERED:
+                statuses = [PurchaseRequestStatus.PRICE_NEGOTIATION, PurchaseRequestStatus.AWAITING_PAYMENT, PurchaseRequestStatus.AWAITING_DELIVERY, PurchaseRequestStatus.DELIVERED]
             else:
                 statuses = [PurchaseRequestStatus.COMPLETED, PurchaseRequestStatus.CANCELLED]
             if seller_id:

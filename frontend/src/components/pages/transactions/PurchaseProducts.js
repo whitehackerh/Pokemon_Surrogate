@@ -59,7 +59,7 @@ const PurchaseProducts = () => {
         if (value === 0) {
             loadListingsProductsTransaction(1, 0);
         } else if (value == 1) {
-            loadListingsProductsTransaction(1, 3);
+            loadListingsProductsTransaction(1, 4);
         }
     }
 
@@ -70,8 +70,7 @@ const PurchaseProducts = () => {
     }
 
     const clickPurchaseRequest = (purchaseRequestId) => {
-        // TODO Navigate
-        navigate('/home');
+      navigate('/transactionChatListing', { state: {purchaseRequestId: purchaseRequestId}});
     }
 
     const mainContents = {

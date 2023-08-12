@@ -13,6 +13,7 @@ class SetPurchaseRequestService(BaseService):
     @transaction.atomic
     def service(self, request):
         try:
+            data = {}
             listing_id = request.get('listing_id')
             buyer_id = int(request.get('buyer_id'))
             listingsModel = Listings()
@@ -24,12 +25,14 @@ class SetPurchaseRequestService(BaseService):
                     'seller_id': listing[0].seller_id,
                     'buyer_id': buyer_id,
                     'price': listing[0].price,
+                    'price_in_negotiation': None,
                     'status': PurchaseRequestStatus.AWAITING_PAYMENT
                 })
                 purchaseRequestsModel.save()
                 listingsModel.updateListingStatus(listing_id, ListingStatus.IN_PROGRESS)
+                data['purchase_request_id'] = purchaseRequestsModel.id
             else:
                 raise CustomExceptions('Invalid Data', ResponseCodes.INTERNAL_SERVER_ERROR)
-            return None
+            return data
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)

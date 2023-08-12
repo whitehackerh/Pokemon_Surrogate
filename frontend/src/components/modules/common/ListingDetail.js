@@ -70,8 +70,7 @@ const ListingDetail = () => {
         }, {
             headers: requestHeaders
         }).then((res) => {
-            // TODO navigation
-            navigate('/home');
+            navigate('/transactionChatListing');
         })
     }
 

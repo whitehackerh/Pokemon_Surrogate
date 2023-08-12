@@ -21,6 +21,7 @@ import EditListing from "./components/pages/transactions/EditListing";
 import ListingDetail from "./components/modules/common/ListingDetail";
 import MarketSales from './components/pages/listings/MarketSales';
 import PurchaseProducts from './components/pages/transactions/PurchaseProducts';
+import TransactionChatListing from './components/pages/transactions/TransactionChatListing';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -64,6 +65,7 @@ const App = () => {
             <Route path="/listingDetail" element={<ListingDetail />} />
             <Route path='/marketSales' element={<MarketSales />} />
             <Route path='/purchaseProducts' element={<PurchaseProducts />} />
+            <Route path='/transactionChatListing' element={<TransactionChatListing />} />
           </Route>
         </Routes>
       </BrowserRouter>
