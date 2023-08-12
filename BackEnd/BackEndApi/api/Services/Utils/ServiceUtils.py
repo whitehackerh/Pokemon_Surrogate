@@ -2,6 +2,7 @@ import base64
 import os
 from api.Enums.ListingStatus import ListingStatus
 from api.Enums.ListingCategory import ListingCategory
+from api.Enums.PurchaseRequestStatus import PurchaseRequestStatus
 from api.Models.Listings import Listings
 
 class ServiceUtils:
@@ -40,3 +41,30 @@ class ServiceUtils:
         model = Listings()
         record = model.getListingDetail(listing_id)
         return record.count() == 1 and record[0].seller_id == int(seller_id) and record[0].status == ListingStatus.SELLING
+    
+    def isEnableCancelPurchaseRequest(status):
+        return status == PurchaseRequestStatus.AWAITING_PAYMENT or status == PurchaseRequestStatus.AWAITING_DELIVERY
+    
+    def isEnablePaymentPurchaseRequest(status, user_id, seller_id, buyer_id):
+        if user_id == seller_id:
+            return False
+        elif user_id == buyer_id:
+            return status == PurchaseRequestStatus.AWAITING_PAYMENT
+        else:
+            return None
+    
+    def isEnableDeliverPurchaseRequest(status, user_id, seller_id, buyer_id):
+        if user_id == seller_id:
+            return status == PurchaseRequestStatus.AWAITING_DELIVERY
+        elif user_id == buyer_id:
+            return False
+        else:
+            return None
+        
+    def isEnableCompletePurchaseRequest(status, user_id, seller_id, buyer_id):
+        if user_id == seller_id:
+            return False
+        elif user_id == buyer_id:
+            return status == PurchaseRequestStatus.DELIVERED
+        else:
+            return None

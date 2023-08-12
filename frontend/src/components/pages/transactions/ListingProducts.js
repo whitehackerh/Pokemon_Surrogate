@@ -98,7 +98,7 @@ const ListingProducts = () => {
       loadListingsProductsTransaction(1, 0);
     } else if (value == 2) {
       setListingStatus(null);
-      loadListingsProductsTransaction(1, 3);
+      loadListingsProductsTransaction(1, 4);
     } else if (value === 3) {
       setPurchaseRequestStatus(null);
       loadListingsProductsNotTransaction(1, 2);
@@ -121,8 +121,7 @@ const ListingProducts = () => {
   }
 
   const clickPurchaseRequest = (purchaseRequestId) => {
-    // TODO Navigate
-    navigate('/home');
+    navigate('/transactionChatListing', { state: {purchaseRequestId: purchaseRequestId}});
   }
 
   const mainContents = {
