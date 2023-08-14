@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { noTokenRequest, withTokenRequest, requestHeaders } from '../../../http';
+import { withTokenRequest, requestHeaders } from '../../../http';
 import Button from "@mui/material/Button";
 import CustomSlider from "../../modules/CustomSlider/CustomSlider";
 import { Table, TableBody, TableCell, TableRow, TableContainer, Paper } from '@mui/material';
@@ -132,7 +132,7 @@ const TransactionChatListing = () => {
         </>
     }
     let requestChangePriceComponent = '';
-    if (purchaseRequestRecord.status == 0 || purchaseRequestRecord.status == 1) {
+    if (purchaseRequestRecord.buyer_id == localStorage.getItem('user_id') && (purchaseRequestRecord.status == 0 || purchaseRequestRecord.status == 1)) {
         requestChangePriceComponent = <>
             {purchaseRequestRecord.status == 0 && !purchaseRequestRecord.enable_response_change_price ? <p>Pending Approval</p> : null}
             <div style={{display: 'flex'}}>
