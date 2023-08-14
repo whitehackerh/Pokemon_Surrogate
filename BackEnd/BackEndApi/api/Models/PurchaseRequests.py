@@ -1,5 +1,6 @@
 from django.db import models
 from api.Enums.ResponseCodes import ResponseCodes
+from api.Enums.PurchaseRequestStatus import PurchaseRequestStatus
 from api.Exceptions.CustomExceptions import CustomExceptions
 from django.db.models import Subquery, OuterRef
 from api.Models.ListingPictures import ListingPictures
@@ -140,3 +141,12 @@ class PurchaseRequests(models.Model):
             return queryset.all()
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def requestChangePrice(self, id, price):
+        try:
+            purchase_request = PurchaseRequests.objects.get(id=id)
+            purchase_request.price_in_negotiation = price
+            purchase_request.status = PurchaseRequestStatus.PRICE_NEGOTIATION
+            purchase_request.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)

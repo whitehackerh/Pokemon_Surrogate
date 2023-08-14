@@ -6,7 +6,7 @@ from api.Responders.GetPurchaseRequestDetailResponder import GetPurchaseRequestD
 from api.Exceptions.CustomExceptions import CustomExceptions
 
 class GetPurchaseRequestDetailView(APIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:

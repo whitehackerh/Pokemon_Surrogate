@@ -5,6 +5,10 @@ import Button from "@mui/material/Button";
 import CustomSlider from "../../modules/CustomSlider/CustomSlider";
 import { Table, TableBody, TableCell, TableRow, TableContainer, Paper } from '@mui/material';
 import ConfirmDialog from "../../modules/dialogs/ConfirmDialog";
+import FormControl from '@mui/material/FormControl';
+import InputAdornment from '@mui/material/InputAdornment';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
 import useInterval from 'use-interval';
 
 const TransactionChatListing = () => {
@@ -13,6 +17,7 @@ const TransactionChatListing = () => {
     const purchaseRequestId = location.state.purchaseRequestId;
     const [pictures, setPictures] = useState([]);
     const [purchaseRequestRecord, setPurchaseRequestRecord] = useState(null);
+    const [inputPriceInNegotiation, setInputPriceInNegotiation] = useState(false);
     requestHeaders.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
 
     useEffect(() => {
@@ -27,6 +32,8 @@ const TransactionChatListing = () => {
         withTokenRequest.post('/getPurchaseRequestDetail', {
             purchase_request_id: purchaseRequestId,
             user_id: localStorage.getItem('user_id')
+        }, {
+            headers: requestHeaders
         }).then((res) => {
             const data = res.data.data;
             setPictures(data.listing_pictures);
@@ -46,15 +53,45 @@ const TransactionChatListing = () => {
                 description: data.description.split('\n'),
                 price: data.price,
                 price_negotiation: data.price_negotiation,
-                price_in_negotiation: data.price_in_negotiation,
+                price_in_negotiation: inputPriceInNegotiation ? purchaseRequestRecord.price_in_negotiation : data.price_in_negotiation,
                 fee_id: data.fee_id,
                 fee_percentage: data.fee_percentage,
                 enable_cancel: data.enable_cancel,
+                enable_request_change_price: data.enable_request_change_price,
+                enable_response_change_price: data.enable_response_change_price,
                 enable_payment: data.enable_payment,
                 enable_deliver: data.enable_deliver,
                 enable_complete: data.enable_complete
             });
         })
+    }
+
+    function requestChangePrice() {
+        withTokenRequest.post('/requestChangePricePurchaseRequest', {
+            purchase_request_id: purchaseRequestId,
+            buyer_id: localStorage.getItem('user_id'),
+            request_price: purchaseRequestRecord.price_in_negotiation
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            setInputPriceInNegotiation(false);
+            getPurchaseRequestDetail();
+        });
+    }
+
+    function handleChange(e, newValue, setterName, setterParams) {
+        const target = e.target;
+        const value = target.value;
+        const name = target.name;
+        switch (setterName) {
+            case 'setPriceInNegotiation':
+                setInputPriceInNegotiation(true);
+                setPurchaseRequestRecord({
+                    ...purchaseRequestRecord,
+                    price_in_negotiation: value
+                });
+                break;
+            }
     }
 
     const mainContents = {
@@ -92,6 +129,25 @@ const TransactionChatListing = () => {
                <TableCell style={keyColumnStyle}>Revenue</TableCell>
                <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>${purchaseRequestRecord.price - purchaseRequestRecord.price * purchaseRequestRecord.fee_percentage}</TableCell>
             </TableRow>
+        </>
+    }
+    let requestChangePriceComponent = '';
+    if (purchaseRequestRecord.status == 0 || purchaseRequestRecord.status == 1) {
+        requestChangePriceComponent = <>
+            {purchaseRequestRecord.status == 0 && !purchaseRequestRecord.enable_response_change_price ? <p>Pending Approval</p> : null}
+            <div style={{display: 'flex'}}>
+                <FormControl sx={{ width: 200 }} variant="standard">
+                    <InputLabel htmlFor="standard-adornment-price">Request Price</InputLabel>
+                    <Input
+                        id="standard-adornment-price"
+                        startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                        value={purchaseRequestRecord.price_in_negotiation}
+                        onChange={(event, newValue) => {handleChange(event, newValue, 'setPriceInNegotiation', null);}}
+                        disabled={!purchaseRequestRecord.enable_request_change_price}
+                    />
+                </FormControl>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <Button variant="contained" disabled={!purchaseRequestRecord.enable_request_change_price} onClick={requestChangePrice}>Request</Button>
+            </div>
         </>
     }
     
@@ -150,6 +206,7 @@ const TransactionChatListing = () => {
                     <img src={`data:image/jpeg;base64,${purchaseRequestRecord.buyer_profile_picture}`} style={profilePictureStyle}></img>
                     <div style={{fontWeight: 'bold'}}>&nbsp;{purchaseRequestRecord.buyer_nickname}</div>
                 </div><br /><br />
+                {requestChangePriceComponent}
             </div>
         </>
     )

@@ -21,6 +21,7 @@ from api.Views.SetPurchaseRequestView import SetPurchaseRequestView
 from api.Views.GetPurchaseRequestsSummaryView import GetPurchaseRequestsSummaryView
 from api.Views.GetPurchaseRequestsView import GetPurchaseRequestsView
 from api.Views.GetPurchaseRequestDetailView import GetPurchaseRequestDetailView
+from api.Views.RequestChangePricePurchaseRequestView import RequestChangePricePurchaseRequestView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -43,5 +44,6 @@ urlpatterns = [
     path('setPurchaseRequest', SetPurchaseRequestView.as_view(), name='setPurchaseRequest'),
     path('getPurchaseRequestsSummary', GetPurchaseRequestsSummaryView.as_view(), name='getPurchaseRequestsSummary'),
     path('getPurchaseRequests', GetPurchaseRequestsView.as_view(), name='getPurchaseRequests'),
-    path('getPurchaseRequestDetail', GetPurchaseRequestDetailView.as_view(), name='getPurchaseRequestDetail')
+    path('getPurchaseRequestDetail', GetPurchaseRequestDetailView.as_view(), name='getPurchaseRequestDetail'),
+    path('requestChangePricePurchaseRequest', RequestChangePricePurchaseRequestView.as_view(), name='requestChangePricePurchaseRequest')
 ]
