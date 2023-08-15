@@ -70,7 +70,7 @@ const ListingDetail = () => {
         }, {
             headers: requestHeaders
         }).then((res) => {
-            navigate('/transactionChatListing');
+            navigate('/transactionChatListing', { state: {purchaseRequestId: res.data.data.purchase_request_id}});
         })
     }
 

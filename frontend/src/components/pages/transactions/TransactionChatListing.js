@@ -21,7 +21,9 @@ const TransactionChatListing = () => {
     requestHeaders.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
 
     useEffect(() => {
-        getPurchaseRequestDetail();
+        if (purchaseRequestId) {
+            getPurchaseRequestDetail();
+        }
     }, []);
 
     useInterval(() => {
@@ -144,7 +146,7 @@ const TransactionChatListing = () => {
         </>
     }
     let requestChangePriceComponent = '';
-    if (purchaseRequestRecord.buyer_id == localStorage.getItem('user_id') && (purchaseRequestRecord.status == 0 || purchaseRequestRecord.status == 1)) {
+    if (purchaseRequestRecord.price_negotiation && purchaseRequestRecord.buyer_id == localStorage.getItem('user_id') && (purchaseRequestRecord.status == 0 || purchaseRequestRecord.status == 1)) {
         requestChangePriceComponent = <>
             {purchaseRequestRecord.status == 0 && !purchaseRequestRecord.enable_response_change_price ? <p>Pending Approval</p> : null}
             <div style={{display: 'flex'}}>
@@ -172,7 +174,9 @@ const TransactionChatListing = () => {
             </div>
         </>;
     }
-    
+    if (!purchaseRequestId) {
+        return <></>;
+    }
     return (
         <>
             <div style={mainContents}>

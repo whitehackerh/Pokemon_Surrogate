@@ -11,7 +11,7 @@ class RequestChangePricePurchaseRequestService(BaseService):
             request_price = request.get('request_price')
             model = PurchaseRequests()
             record = model.getPurchaseRequestDetail(purchase_request_id)
-            if record.count() == 1 and ServiceUtils.isEnableRequestChangePricePurchaseRequest(record[0].status, int(request.get('buyer_id')), record[0].seller_id, record[0].buyer_id) and record[0].price != int(request_price):
+            if record.count() == 1 and ServiceUtils.isEnableRequestChangePricePurchaseRequest(record[0].price_negotiation, record[0].status, int(request.get('buyer_id')), record[0].seller_id, record[0].buyer_id) and record[0].price != int(request_price):
                 model.requestChangePrice(purchase_request_id, request.get('request_price'))
             else:
                 raise CustomExceptions('Invalid Data', ResponseCodes.INTERNAL_SERVER_ERROR)

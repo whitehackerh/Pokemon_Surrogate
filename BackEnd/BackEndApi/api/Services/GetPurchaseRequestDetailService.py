@@ -53,7 +53,7 @@ class GetPurchaseRequestDetailService(BaseService):
                 'fee_percentage': purchase_request.fee_percentage,
                 'listing_pictures': pictures,
                 'enable_cancel': ServiceUtils.isEnableCancelPurchaseRequest(purchase_request.status),
-                'enable_request_change_price': ServiceUtils.isEnableRequestChangePricePurchaseRequest(purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id),
+                'enable_request_change_price': ServiceUtils.isEnableRequestChangePricePurchaseRequest(purchase_request.price_negotiation, purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id),
                 'enable_response_change_price': ServiceUtils.isEnableResponseChangePricePurchaseRequest(purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id),
                 'enable_payment': ServiceUtils.isEnablePaymentPurchaseRequest(purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id),
                 'enable_deliver': ServiceUtils.isEnableDeliverPurchaseRequest(purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id),

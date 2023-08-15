@@ -45,7 +45,9 @@ class ServiceUtils:
     def isEnableCancelPurchaseRequest(status):
         return status == PurchaseRequestStatus.AWAITING_PAYMENT or status == PurchaseRequestStatus.AWAITING_DELIVERY
     
-    def isEnableRequestChangePricePurchaseRequest(status, user_id, seller_id, buyer_id):
+    def isEnableRequestChangePricePurchaseRequest(price_negotiation, status, user_id, seller_id, buyer_id):
+        if not price_negotiation:
+            return False
         if user_id == seller_id:
             return False
         elif user_id == buyer_id:
