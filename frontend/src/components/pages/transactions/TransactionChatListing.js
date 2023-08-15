@@ -79,6 +79,18 @@ const TransactionChatListing = () => {
         });
     }
 
+    function responseChangePrice(response) {
+        withTokenRequest.post('/responseChangePricePurchaseRequest', {
+            purchase_request_id: purchaseRequestId,
+            seller_id: localStorage.getItem('user_id'),
+            response: response
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getPurchaseRequestDetail();
+        });
+    }
+
     function handleChange(e, newValue, setterName, setterParams) {
         const target = e.target;
         const value = target.value;
@@ -150,6 +162,16 @@ const TransactionChatListing = () => {
             </div>
         </>
     }
+    let responseChangePriceComponent = '';
+    if (purchaseRequestRecord.enable_response_change_price) {
+        responseChangePriceComponent = <>
+            <p style={{'font-weight': 'bold'}}>Request Price: &nbsp;<span style={{'color': 'red'}}>${purchaseRequestRecord.price_in_negotiation}</span></p>
+            <div style={{display: 'flex'}}>
+            <Button variant="contained" onClick={() => responseChangePrice(true)}>Accept</Button>&nbsp;&nbsp;
+            <Button variant="contained" onClick={() => responseChangePrice(false)}>Reject</Button>
+            </div>
+        </>;
+    }
     
     return (
         <>
@@ -207,6 +229,7 @@ const TransactionChatListing = () => {
                     <div style={{fontWeight: 'bold'}}>&nbsp;{purchaseRequestRecord.buyer_nickname}</div>
                 </div><br /><br />
                 {requestChangePriceComponent}
+                {responseChangePriceComponent}
             </div>
         </>
     )

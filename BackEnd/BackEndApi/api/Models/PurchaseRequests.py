@@ -150,3 +150,14 @@ class PurchaseRequests(models.Model):
             purchase_request.save()
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def responseChangePrice(self, id, response, price_in_negotiation):
+        try:
+            purchase_request = PurchaseRequests.objects.get(id=id)
+            purchase_request.price_in_negotiation = None
+            purchase_request.status = PurchaseRequestStatus.AWAITING_PAYMENT
+            if response:
+                purchase_request.price = price_in_negotiation
+            purchase_request.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
