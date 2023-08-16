@@ -26,6 +26,7 @@ from api.Views.ResponseChangePricePurchaseRequestView import ResponseChangePrice
 from api.Views.PayForPurchaseRequestView import PayForPurchaseRequestView
 from api.Views.DeliverProductPurchaseRequestView import DeliverProductPurchaseRequestView
 from api.Views.CompleteTransactionPurchaseRequestView import CompleteTransactionPurchaseRequestView
+from api.Views.CancelTransactionPurchaseRequestView import CancelTransactionPurchaseRequestView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -53,5 +54,6 @@ urlpatterns = [
     path('responseChangePricePurchaseRequest', ResponseChangePricePurchaseRequestView.as_view(), name='responseChangePricePurchaseRequest'),
     path('payForPurchaseRequest', PayForPurchaseRequestView.as_view(), name='payForPurchaseRequest'),
     path('deliverProductPurchaseRequest', DeliverProductPurchaseRequestView.as_view(), name='deliverProductPurchaseRequest'),
-    path('completeTransactionPurchaseRequest', CompleteTransactionPurchaseRequestView.as_view(), name='completeTransactionPurchaseRequest')
+    path('completeTransactionPurchaseRequest', CompleteTransactionPurchaseRequestView.as_view(), name='completeTransactionPurchaseRequest'),
+    path('cancelTransactionPurchaseRequest', CancelTransactionPurchaseRequestView.as_view(), name='cancelTransactionPurchaseRequest')
 ]

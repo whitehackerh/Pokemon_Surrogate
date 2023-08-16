@@ -126,6 +126,17 @@ const TransactionChatListing = () => {
         });
     }
 
+    function cancelTransactionPurchaseRequest() {
+        withTokenRequest.post('cancelTransactionPurchaseRequest', {
+            purchase_request_id: purchaseRequestId,
+            user_id: localStorage.getItem('user_id')
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getPurchaseRequestDetail();
+        });
+    }
+
     function handleChange(e, newValue, setterName, setterParams) {
         const target = e.target;
         const value = target.value;
@@ -215,7 +226,7 @@ const TransactionChatListing = () => {
                     />
                 </FormControl>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <Button variant="contained" disabled={!purchaseRequestRecord.enable_request_change_price} onClick={requestChangePrice}>Request</Button>
-            </div>
+            </div><br /><br />
         </>
     }
     let responseChangePriceComponent = '';
@@ -226,6 +237,13 @@ const TransactionChatListing = () => {
             <Button variant="contained" onClick={() => responseChangePrice(true)}>Accept</Button>&nbsp;&nbsp;
             <Button variant="contained" onClick={() => responseChangePrice(false)}>Reject</Button>
             </div>
+        </>;
+    }
+    let cancelComponent = '';
+    if (purchaseRequestRecord.enable_cancel) {
+        cancelComponent = <>
+            <ConfirmDialog text='Cancel Transaction' message='Are you sure you want to cancel transaction?' callback={cancelTransactionPurchaseRequest}/>
+            <br /><br />
         </>;
     }
     if (!purchaseRequestId) {
@@ -291,6 +309,7 @@ const TransactionChatListing = () => {
                 {completeComponent}
                 {requestChangePriceComponent}
                 {responseChangePriceComponent}
+                {cancelComponent}
             </div>
         </>
     )
