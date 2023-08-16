@@ -191,11 +191,3 @@ class Listings(models.Model):
             return queryset.all()
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
-    
-    def removeListing(self, listing_id):
-        try:
-            listing = Listings.objects.get(id=listing_id)
-            listing.status = ListingStatus.REMOVED
-            listing.save()
-        except Exception as e:
-            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
