@@ -93,6 +93,17 @@ const TransactionChatListing = () => {
         });
     }
 
+    function payForPurchaseRequest() {
+        withTokenRequest.post('payForPurchaseRequest', {
+            purchase_request_id: purchaseRequestId,
+            buyer_id: localStorage.getItem('user_id')
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getPurchaseRequestDetail();
+        });
+    }
+
     function handleChange(e, newValue, setterName, setterParams) {
         const target = e.target;
         const value = target.value;
@@ -144,6 +155,13 @@ const TransactionChatListing = () => {
                <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>${purchaseRequestRecord.price - purchaseRequestRecord.price * purchaseRequestRecord.fee_percentage}</TableCell>
             </TableRow>
         </>
+    }
+    let payComponent = '';
+    if (purchaseRequestRecord.enable_payment) {
+        payComponent = <>
+            <ConfirmDialog text='Payment' message='Are you sure you want to payment?' callback={payForPurchaseRequest}/>
+            <br /><br />
+        </>;
     }
     let requestChangePriceComponent = '';
     if (purchaseRequestRecord.price_negotiation && purchaseRequestRecord.buyer_id == localStorage.getItem('user_id') && (purchaseRequestRecord.status == 0 || purchaseRequestRecord.status == 1)) {
@@ -232,6 +250,7 @@ const TransactionChatListing = () => {
                     <img src={`data:image/jpeg;base64,${purchaseRequestRecord.buyer_profile_picture}`} style={profilePictureStyle}></img>
                     <div style={{fontWeight: 'bold'}}>&nbsp;{purchaseRequestRecord.buyer_nickname}</div>
                 </div><br /><br />
+                {payComponent}
                 {requestChangePriceComponent}
                 {responseChangePriceComponent}
             </div>

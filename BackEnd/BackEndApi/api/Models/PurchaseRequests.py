@@ -161,3 +161,12 @@ class PurchaseRequests(models.Model):
             purchase_request.save()
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def updateStatus(self, id, status):
+        try:
+            purchase_request = PurchaseRequests.objects.get(id=id)
+            purchase_request.status = status
+            purchase_request.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+        
