@@ -115,6 +115,17 @@ const TransactionChatListing = () => {
         });
     }
 
+    function completeTransactionPurchaseRequest() {
+        withTokenRequest.post('completeTransactionPurchaseRequest', {
+            purchase_request_id: purchaseRequestId,
+            buyer_id: localStorage.getItem('user_id')
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getPurchaseRequestDetail();
+        });
+    }
+
     function handleChange(e, newValue, setterName, setterParams) {
         const target = e.target;
         const value = target.value;
@@ -178,6 +189,13 @@ const TransactionChatListing = () => {
     if (purchaseRequestRecord.enable_deliver) {
         deliverComponent = <>
             <ConfirmDialog text='Complete Deliver' message='Are you sure you have completed delivery?' callback={deliverProductPurchaseRequest}/>
+            <br /><br />
+        </>;
+    }
+    let completeComponent = '';
+    if (purchaseRequestRecord.enable_complete) {
+        completeComponent = <>
+            <ConfirmDialog text='Complete Transaction' message='Are you sure you want to complete transaction?' callback={completeTransactionPurchaseRequest}/>
             <br /><br />
         </>;
     }
@@ -270,6 +288,7 @@ const TransactionChatListing = () => {
                 </div><br /><br />
                 {payComponent}
                 {deliverComponent}
+                {completeComponent}
                 {requestChangePriceComponent}
                 {responseChangePriceComponent}
             </div>
