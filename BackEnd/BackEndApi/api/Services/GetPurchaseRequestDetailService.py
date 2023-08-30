@@ -57,7 +57,8 @@ class GetPurchaseRequestDetailService(BaseService):
                 'enable_response_change_price': ServiceUtils.isEnableResponseChangePricePurchaseRequest(purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id),
                 'enable_payment': ServiceUtils.isEnablePaymentPurchaseRequest(purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id),
                 'enable_deliver': ServiceUtils.isEnableDeliverPurchaseRequest(purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id),
-                'enable_complete': ServiceUtils.isEnableCompletePurchaseRequest(purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id)
+                'enable_complete': ServiceUtils.isEnableCompletePurchaseRequest(purchase_request.status, user_id, purchase_request.seller_id, purchase_request.buyer_id),
+                'enable_send_message': ServiceUtils.isEnableSendMessagePurchaseRequest(purchase_request.status)
             }
         else:
             return None

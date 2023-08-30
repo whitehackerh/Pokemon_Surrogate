@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { withTokenRequest, requestHeaders } from '../../../http';
+import { withTokenRequest, requestHeaders, multipartFormData } from '../../../http';
 import Button from "@mui/material/Button";
 import CustomSlider from "../../modules/CustomSlider/CustomSlider";
 import { Table, TableBody, TableCell, TableRow, TableContainer, Paper } from '@mui/material';
@@ -10,6 +10,10 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import useInterval from 'use-interval';
+import { ChatContainer, MessageList, Message, MessageInput, ConversationHeader, Avatar, MessageSeparator } from '@chatscope/chat-ui-kit-react';
+import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import styled from 'styled-components';
+import Delete from '@mui/icons-material/Delete';
 
 const TransactionChatListing = () => {
     const navigate = useNavigate();
@@ -18,7 +22,14 @@ const TransactionChatListing = () => {
     const [pictures, setPictures] = useState([]);
     const [purchaseRequestRecord, setPurchaseRequestRecord] = useState(null);
     const [inputPriceInNegotiation, setInputPriceInNegotiation] = useState(false);
+    const [inputMessage, setInputMessage] = useState(null);
+    const [picturePreview, setPicturePreview] = useState(false);
+    const [pictureBlob, setPictureBlob] = useState(null);
+    const [avatarPicture, setAvatarPicture] = useState(null);
+    const [otherName, setOtherName] = useState(null);
+    const [messages, setMessages] = useState([]);
     requestHeaders.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
+    multipartFormData.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
 
     useEffect(() => {
         if (purchaseRequestId) {
@@ -31,9 +42,10 @@ const TransactionChatListing = () => {
     }, 5000);
 
     function getPurchaseRequestDetail() {
+        const user_id = localStorage.getItem('user_id');
         withTokenRequest.post('/getPurchaseRequestDetail', {
             purchase_request_id: purchaseRequestId,
-            user_id: localStorage.getItem('user_id')
+            user_id: user_id
         }, {
             headers: requestHeaders
         }).then((res) => {
@@ -63,8 +75,11 @@ const TransactionChatListing = () => {
                 enable_response_change_price: data.enable_response_change_price,
                 enable_payment: data.enable_payment,
                 enable_deliver: data.enable_deliver,
-                enable_complete: data.enable_complete
+                enable_complete: data.enable_complete,
+                enable_send_message: data.enable_send_message
             });
+            setAvatarPicture(user_id == data.seller_id ? data.seller_profile_picture : data.buyer_profile_picture);
+            setOtherName(user_id == data.seller_id ? data.seller_nickname : data.buyer_nickname);
         })
     }
 
@@ -152,11 +167,114 @@ const TransactionChatListing = () => {
             }
     }
 
+    const messageGroups = groupByDate(messages);
+    function groupByDate(messages) {
+        return messages.reduce((groups, message) => {
+            const date = new Date(message.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('/');
+            const lastGroup = groups[groups.length - 1];
+        
+            if (lastGroup && lastGroup.date === date) {
+              lastGroup.messages.push(message);
+            } else {
+              groups.push({ date, messages: [message] });
+            }
+            return groups;
+          }, []);
+    }
+
+    function sendMessage() {
+        let requestMessage = inputMessage;
+        if (requestMessage.includes('<inputmessage>')) {
+            requestMessage = requestMessage.substring(requestMessage.indexOf('<inputmessage>') + 14, requestMessage.indexOf('</inputmessage>'));
+            requestMessage = requestMessage.replace(/n/, '');
+        }
+        if (requestMessage == '' || !requestMessage.length || requestMessage == null) {
+            requestMessage = '';
+        }
+        const submitData = new FormData();
+        submitData.append('purchase_request_id', purchaseRequestId);
+        submitData.append('sender_id', localStorage.getItem('user_id'));
+        submitData.append('message', requestMessage);
+        submitData.append('picture', pictureBlob);
+        withTokenRequest.post('/sendMessagePurchaseRequest', submitData, {
+            headers: multipartFormData
+        }).then(() => {
+            setInputMessage(null);
+            setPicturePreview(false);
+            setPictureBlob(null);
+            // getMessages();
+        })
+    }
+
+    const handleAttachClick = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (event) => {
+          const file = event.target.files[0];
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => {
+            setPicturePreview(true);
+            setPictureBlob(file);
+            setInputMessage(`
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+                <img src="${reader.result}" alt="attachment preview" width="200" style={{ zIndex: 1 }} />
+            </div><br><inputmessage>${inputMessage || ''}</inputmessage>
+            `);       
+          };
+        };
+        input.click();
+    };
+
+    function handleRemoveInputPicture() {
+        let temp = inputMessage.substring(inputMessage.indexOf('<inputmessage>') + 14, inputMessage.indexOf('</inputmessage>'));
+        if (temp < 0) {
+            setInputMessage(null);
+        } else {
+            setInputMessage(temp.replace(/n/, ''));
+        }
+        setPicturePreview(false);
+        setPictureBlob(null);
+    };
+
+    const handleInputMessage = (innerHtml, textContent, innerText, nodes) => {
+        if (inputMessage == null || !inputMessage.includes('<inputmessage></inputmessage>')) {
+            setInputMessage(innerHtml);
+        } else if (inputMessage.includes('<inputmessage></inputmessage>')) {
+            setInputMessage(inputMessage.replace('<inputmessage></inputmessage>', '<inputmessage>' + innerText + '</inputmessage>'))
+        }
+    };
+
+    const handleMouseEnter = (messageId) => {
+        // document.getElementById(`delete-button-${messageId}`).style.display = "inline";
+        // document.getElementById(`message-${messageId}`).style.marginLeft="5px";
+    }
+    
+    const handleMouseLeave = (messageId) => {
+        // document.getElementById(`delete-button-${messageId}`).style.display = "none";
+        // document.getElementById(`message-${messageId}`).style.removeProperty('margin-left');
+    }
+
+    const deleteMessage = (message) => {
+        // setDeletingMessage(message);
+        // withTokenRequest.post('/deleteMessage', {
+        //     user_id: localStorage.getItem('user_id'),
+        //     id: message
+        // }, {
+        //     headers: requestHeaders
+        // }).then(() => {
+        //     setDeletingMessage(null);
+        //     getMessages(otherUserId);
+        // })
+    }
+
     const mainContents = {
         float: 'left',
         margin: '10px',
         // 'text-align': 'center',
-        width: 'calc(100% - 362px)'
+        width: 'calc(100% - 362px)',
+        display: 'flex'
     }
     const sliderStyle = {
         width: '30%'
@@ -170,6 +288,24 @@ const TransactionChatListing = () => {
         width: '50px',
         height: '50px'
     }
+    const styledTextArea = styled.textarea`
+        width: 100%;
+        height: 100%;
+        resize: none;
+        border: none;
+        padding: 10px;
+        font-size: 16px;
+        box-sizing: border-box;
+        white-space: pre-wrap;
+        caret-color: #2a9d8f;
+        `;
+    const messageFrame = {
+        margin: '20px auto',
+        border: 'solid black',
+        width: '100%',
+        position: 'relative',
+        height: '800px'
+    };
 
     if (!purchaseRequestRecord) {
         return (
@@ -252,64 +388,230 @@ const TransactionChatListing = () => {
     return (
         <>
             <div style={mainContents}>
-                <div style={sliderStyle}>
-                    <CustomSlider>
-                        {pictures.map((picture, index) => {
-                            return <img key={index} src={`data:image/jpeg;base64,${picture}`}/>;
-                        })}
-                    </CustomSlider>
-                </div>
-                <br /><br />
-                <h2 style={{backGroundColor: 'blue'}}>{purchaseRequestRecord.listing_title}</h2><br />
-                <div style={{fontWeight: 'bold', backgroundColor: 'black', color: 'white', width: '40%', height: '25px'}}>Description of product</div><br />
-                {purchaseRequestRecord.description.map((line, index) => (
-                    <>
-                    {line}
+                <div style={{ width: '100%'}}>
+                    <div style={sliderStyle}>
+                        <CustomSlider>
+                            {pictures.map((picture, index) => {
+                                return <img key={index} src={`data:image/jpeg;base64,${picture}`}/>;
+                            })}
+                        </CustomSlider>
+                    </div>
+                    <br /><br />
+                    <h2 style={{backGroundColor: 'blue'}}>{purchaseRequestRecord.listing_title}</h2><br />
+                    <div style={{fontWeight: 'bold', backgroundColor: 'black', color: 'white', width: '70%', height: '25px'}}>Description of product</div><br />
+                    {purchaseRequestRecord.description.map((line, index) => (
+                        <>
+                        {line}
+                        <br />
+                        </>
+                    ))}
                     <br />
-                    </>
-                ))}
-                <br />
-                <TableContainer component={Paper} style={{width: '40%'}}>
-                    <Table>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell style={keyColumnStyle}>Game Title</TableCell>
-                                <TableCell>{purchaseRequestRecord.game_title}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell style={keyColumnStyle}>Category</TableCell>
-                                <TableCell>{purchaseRequestRecord.category}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell style={keyColumnStyle}>Price</TableCell>
-                                <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>${purchaseRequestRecord.price}</TableCell>
-                            </TableRow>
-                            {fees}
-                            <TableRow>
-                                <TableCell style={keyColumnStyle}>Price Negotiation</TableCell>
-                                <TableCell>{purchaseRequestRecord.price_negotiation ? 'OK' : 'NG'}</TableCell>
-                            </TableRow>
- 
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <br /><br />
-                <div style={{fontWeight: 'bold'}}>Seller</div><br />
-                <div style={{border: '1px solid black', height: '50px', width: '30%', display: 'flex'}}>
-                    <img src={`data:image/jpeg;base64,${purchaseRequestRecord.seller_profile_picture}`} style={profilePictureStyle}></img>
-                    <div style={{fontWeight: 'bold'}}>&nbsp;{purchaseRequestRecord.seller_nickname}</div>
-                </div><br />
-                <div style={{fontWeight: 'bold'}}>Buyer</div><br />
-                <div style={{border: '1px solid black', height: '50px', width: '30%', display: 'flex'}}>
-                    <img src={`data:image/jpeg;base64,${purchaseRequestRecord.buyer_profile_picture}`} style={profilePictureStyle}></img>
-                    <div style={{fontWeight: 'bold'}}>&nbsp;{purchaseRequestRecord.buyer_nickname}</div>
-                </div><br /><br />
-                {payComponent}
-                {deliverComponent}
-                {completeComponent}
-                {requestChangePriceComponent}
-                {responseChangePriceComponent}
-                {cancelComponent}
+                    <TableContainer component={Paper} style={{width: '70%'}}>
+                        <Table>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell style={keyColumnStyle}>Game Title</TableCell>
+                                    <TableCell>{purchaseRequestRecord.game_title}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell style={keyColumnStyle}>Category</TableCell>
+                                    <TableCell>{purchaseRequestRecord.category}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell style={keyColumnStyle}>Price</TableCell>
+                                    <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>${purchaseRequestRecord.price}</TableCell>
+                                </TableRow>
+                                {fees}
+                                <TableRow>
+                                    <TableCell style={keyColumnStyle}>Price Negotiation</TableCell>
+                                    <TableCell>{purchaseRequestRecord.price_negotiation ? 'OK' : 'NG'}</TableCell>
+                                </TableRow>
+    
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <br /><br />
+                    <div style={{fontWeight: 'bold'}}>Seller</div><br />
+                    <div style={{border: '1px solid black', height: '50px', width: '40%', display: 'flex'}}>
+                        <img src={`data:image/jpeg;base64,${purchaseRequestRecord.seller_profile_picture}`} style={profilePictureStyle}></img>
+                        <div style={{fontWeight: 'bold'}}>&nbsp;{purchaseRequestRecord.seller_nickname}</div>
+                    </div><br />
+                    <div style={{fontWeight: 'bold'}}>Buyer</div><br />
+                    <div style={{border: '1px solid black', height: '50px', width: '40%', display: 'flex'}}>
+                        <img src={`data:image/jpeg;base64,${purchaseRequestRecord.buyer_profile_picture}`} style={profilePictureStyle}></img>
+                        <div style={{fontWeight: 'bold'}}>&nbsp;{purchaseRequestRecord.buyer_nickname}</div>
+                    </div><br /><br />
+                    {payComponent}
+                    {deliverComponent}
+                    {completeComponent}
+                    {requestChangePriceComponent}
+                    {responseChangePriceComponent}
+                    {cancelComponent}
+                </div>
+
+                <div style={messageFrame}>
+                    <ChatContainer>
+                        <ConversationHeader>
+                            <Avatar src={`data:image/jpeg;base64,${avatarPicture}`}></Avatar>
+                            <ConversationHeader.Content
+                                userName={otherName}
+                            />
+                        </ConversationHeader>
+                            <MessageList style={{height: '600px'}}>
+                            {messageGroups.map((group, index) => (
+                                <>
+                                {<MessageSeparator content={group.date}/>}
+                                {group.messages.map((message) => (
+                                    <>
+                                        {message.sender_id == localStorage.getItem('user_id') && message.message != null && !message.picture && (
+                                            <div style={{display: 'flex'}} key={message.id} onMouseEnter={() => handleMouseEnter(message.id)} onMouseLeave={() => handleMouseLeave(message.id)}>
+                                                <Delete
+                                                    id={`delete-button-${message.id}`}
+                                                    style={{ display: 'none', cursor: 'pointer', 'margin-right': '0px', 'margin-left': 'auto' }}
+                                                    onClick={() => {
+                                                        if (window.confirm('Are you sure you want to delete?')) {
+                                                        deleteMessage(message.id);
+                                                        }
+                                                    }}
+                                                />
+                                                <Message className="outgoing"
+                                                id={`message-${message.id}`}
+                                                model={{
+                                                message: message.message,
+                                                direction: 'outgoing',
+                                                position: 'single',
+                                                }}
+                                                >
+                                                    <Message.Footer sentTime={message.created_at.split(' ')[1]} />
+                                                </Message>
+                                            </div>
+                                        )}
+                                        {message.sender_id == localStorage.getItem('user_id') && message.message == null && message.picture && (
+                                            <div style={{display: 'flex'}} key={message.id} onMouseEnter={() => handleMouseEnter(message.id)} onMouseLeave={() => handleMouseLeave(message.id)}>
+                                                <Delete
+                                                    id={`delete-button-${message.id}`}
+                                                    style={{ display: 'none', cursor: 'pointer', 'margin-right': '0px', 'margin-left': 'auto' }}
+                                                    onClick={() => {
+                                                        if (window.confirm('Are you sure you want to delete?')) {
+                                                        deleteMessage(message.id);
+                                                        }
+                                                    }}
+                                                />
+                                                <Message className="outgoing"
+                                                id={`message-${message.id}`}
+                                                model={{
+                                                direction: 'outgoing',
+                                                position: 'single',
+                                                }}
+                                                // onClick={() => showPictureOriginal(message.picture)}
+                                            >
+                                                <Message.ImageContent src={message.picture} alt="picture" width={300} />
+                                                <Message.Footer sentTime={message.created_at.split(' ')[1]} />
+                                            </Message>
+                                            </div>
+                                        )}
+                                        {message.sender_id == localStorage.getItem('user_id') && message.message != null && message.picture && (
+                                            <>
+                                                <div key={message.id} onMouseEnter={() => handleMouseEnter(message.id)} onMouseLeave={() => handleMouseLeave(message.id)}>
+                                                    <div style={{display: 'flex'}}>
+                                                        <Delete
+                                                            id={`delete-button-${message.id}`}
+                                                            style={{ display: 'none', cursor: 'pointer', 'margin-right': '0px', 'margin-left': 'auto' }}
+                                                            onClick={() => {
+                                                                if (window.confirm('Are you sure you want to delete?')) {
+                                                                deleteMessage(message.id);
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Message className="outgoing"
+                                                        id={`message-${message.id}`}
+                                                        model={{
+                                                        direction: 'outgoing',
+                                                        position: 'single',
+                                                        }}
+                                                        // onClick={() => showPictureOriginal(message.picture)}
+                                                    >
+                                                        <Message.ImageContent src={message.picture} alt="picture" width={300} />
+                                                    </Message>
+                                                    </div>
+                                                    <Message
+                                                        model={{
+                                                            message: message.message,
+                                                            direction: 'outgoing',
+                                                            position: 'bottom',
+                                                        }}
+                                                    ><Message.Footer sentTime={message.created_at.split(' ')[1]} />
+                                                    </Message>
+                                                </div>
+                                            </>
+                                        )}
+                                        {message.sender_id != localStorage.getItem('user_id') && message.message != null && !message.picture && (
+                                                <Message
+                                                model={{
+                                                message: message.message,
+                                                direction: 'incoming',
+                                                position: 'single',
+                                                }}
+                                                >
+                                                    <Message.Footer sender={message.created_at.split(' ')[1]} />
+                                                </Message>
+                                        )}
+                                        {message.sender_id != localStorage.getItem('user_id') && message.message == null && message.picture && (
+                                                <Message
+                                                model={{
+                                                direction: 'incoming',
+                                                position: 'single',
+                                                }}
+                                                // onClick={() => showPictureOriginal(message.picture)}
+                                            >
+                                                <Message.ImageContent src={message.picture} alt="picture" width={300} />
+                                                <Message.Footer sender={message.created_at.split(' ')[1]} />
+                                            </Message>
+                                        )}
+                                        {message.sender_id != localStorage.getItem('user_id') && message.message != null && message.picture && (
+                                            <>
+                                                <Message
+                                                model={{
+                                                direction: 'incoming',
+                                                position: 'single',
+                                                }}
+                                                // onClick={() => showPictureOriginal(message.picture)}
+                                                >
+                                                    <Message.ImageContent src={message.picture} alt="picture" width={300} />
+                                                </Message>
+                                                <Message
+                                                    model={{
+                                                        message: message.message,
+                                                        direction: 'incoming',
+                                                        position: 'bottom',
+                                                    }}
+                                                >
+                                                    <Message.Footer sender={message.created_at.split(' ')[1]} />
+                                                </Message>
+                                            </> 
+                                        )}
+                                    </>
+                                ))}
+                                </>
+                            ))}
+                            </MessageList>
+                        <MessageInput
+                            placeholder="Type your message here..."
+                            multiline={true}
+                            onSend={sendMessage}
+                            value={inputMessage}
+                            onChange={handleInputMessage}
+                            attachButton={true}
+                            attachDisabled={picturePreview}
+                            sendButton={true}
+                            sendDisabled={false}
+                            onAttachClick={handleAttachClick}
+                            style={{styledTextArea}}
+                         >
+                        </MessageInput>
+                    </ChatContainer>
+                    <Delete className="deletePreview" style={{visibility: picturePreview ? 'visible' : 'hidden', width: '30px', position: 'absolute', top: '720px', left: '6px'}} onClick={handleRemoveInputPicture}></Delete>
+                </div>
             </div>
         </>
     )
