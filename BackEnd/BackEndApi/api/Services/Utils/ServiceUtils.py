@@ -86,3 +86,6 @@ class ServiceUtils:
             return status == PurchaseRequestStatus.DELIVERED
         else:
             return None
+    
+    def isEnableSendMessagePurchaseRequest(status):
+        return status <= PurchaseRequestStatus.DELIVERED

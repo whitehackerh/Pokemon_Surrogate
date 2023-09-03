@@ -27,6 +27,10 @@ from api.Views.PayForPurchaseRequestView import PayForPurchaseRequestView
 from api.Views.DeliverProductPurchaseRequestView import DeliverProductPurchaseRequestView
 from api.Views.CompleteTransactionPurchaseRequestView import CompleteTransactionPurchaseRequestView
 from api.Views.CancelTransactionPurchaseRequestView import CancelTransactionPurchaseRequestView
+from api.Views.SendMessagePurchaseRequestView import SendMessagePurchaseRequestView
+from api.Views.GetMessagesPurchaseRequestView import GetMessagesPurchaseRequestView
+from api.Views.SetReadMessagesPurchaseRequestView import SetReadMessagesPurchaseRequestView
+from api.Views.DeleteMessagePurchaseRequestView import DeleteMessagePurchaseRequestView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -55,5 +59,9 @@ urlpatterns = [
     path('payForPurchaseRequest', PayForPurchaseRequestView.as_view(), name='payForPurchaseRequest'),
     path('deliverProductPurchaseRequest', DeliverProductPurchaseRequestView.as_view(), name='deliverProductPurchaseRequest'),
     path('completeTransactionPurchaseRequest', CompleteTransactionPurchaseRequestView.as_view(), name='completeTransactionPurchaseRequest'),
-    path('cancelTransactionPurchaseRequest', CancelTransactionPurchaseRequestView.as_view(), name='cancelTransactionPurchaseRequest')
+    path('cancelTransactionPurchaseRequest', CancelTransactionPurchaseRequestView.as_view(), name='cancelTransactionPurchaseRequest'),
+    path('sendMessagePurchaseRequest', SendMessagePurchaseRequestView.as_view(), name='sendMessagePurchaseRequest'),
+    path('getMessagesPurchaseRequest', GetMessagesPurchaseRequestView.as_view(), name='getMessagesPurchaseRequest'),
+    path('setReadMessagesPurchaseRequest', SetReadMessagesPurchaseRequestView.as_view(), name='setReadMessagesPurchaseRequest'),
+    path('deleteMessagePurchaseRequest', DeleteMessagePurchaseRequestView.as_view(), name='deleteMessagePurchaseRequest')
 ]

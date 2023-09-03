@@ -9,7 +9,15 @@ from api.Models.Listings import Listings
 from api.Models.ListingPictures import ListingPictures
 from api.Models.PurchaseRequests import PurchaseRequests
 
-__all__ = ['Users', 'GameTitles', 'Fees', 'Listings', 'ListingPictures', 'PurchaseRequests']
+__all__ = [
+    'Users',
+    'GameTitles',
+    'Fees',
+    'Listings',
+    'ListingPictures',
+    'PurchaseRequests',
+    'PurchaseRequestMessages'
+]
 
 class Users(AbstractUser):
     nickname = models.CharField(max_length=255)
