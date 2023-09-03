@@ -28,17 +28,23 @@ const TransactionChatListing = () => {
     const [avatarPicture, setAvatarPicture] = useState(null);
     const [otherName, setOtherName] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [fetching, setFetching] = useState(false);
+    const [firstRequest, setFirstRequest] = useState(true);
+    const [displayedLatestId, setDisplayedLatestId] = useState(null);
+    const [deletingMessage, setDeletingMessage] = useState(false);
     requestHeaders.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
     multipartFormData.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
 
     useEffect(() => {
         if (purchaseRequestId) {
             getPurchaseRequestDetail();
+            getMessages();
         }
     }, []);
 
     useInterval(() => {
         getPurchaseRequestDetail();
+        getMessagesLatest();
     }, 5000);
 
     function getPurchaseRequestDetail() {
@@ -81,6 +87,58 @@ const TransactionChatListing = () => {
             setAvatarPicture(user_id == data.seller_id ? data.seller_profile_picture : data.buyer_profile_picture);
             setOtherName(user_id == data.seller_id ? data.seller_nickname : data.buyer_nickname);
         })
+    }
+
+    function getMessages() {
+        setFetching(true);
+        const user_id = localStorage.getItem('user_id');
+        withTokenRequest.post('/getMessagesPurchaseRequest', {
+            purchase_request_id: purchaseRequestId,
+            user_id: user_id,
+            displayed_latest_id: null
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            if (res.data.data.messages.length) {
+                setMessages(res.data.data.messages);
+                setReadMessages(res.data.data.messages[res.data.data.messages.length - 1].id);
+                setDisplayedLatestId(res.data.data.messages[res.data.data.messages.length - 1].id);
+            }
+            setFirstRequest(false);
+            setFetching(false);
+        })
+    }
+
+    function getMessagesLatest() {
+        if (!firstRequest && !fetching && !deletingMessage) {
+            const user_id = localStorage.getItem('user_id');
+            setFetching(true);
+            withTokenRequest.post('/getMessagesPurchaseRequest', {
+                purchase_request_id: purchaseRequestId,
+                user_id: user_id,
+                displayed_latest_id: displayedLatestId
+            }, {
+                headers: requestHeaders
+            }).then((res) => {
+                if (res.data.data.messages.length) {
+                    setDisplayedLatestId(res.data.data.messages[res.data.data.messages.length - 1].id);
+                    setMessages(prevArray => prevArray.concat(res.data.data.messages));
+                    setReadMessages(res.data.data.messages[res.data.data.messages.length - 1].id);
+                }
+                setFetching(false);
+            })
+        }
+    }
+
+    function setReadMessages(id) {
+        withTokenRequest.post('/setReadMessagesPurchaseRequest', {
+            purchase_request_id: purchaseRequestId,
+            user_id: localStorage.getItem('user_id'),
+            displayed_latest_id: id
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+        });
     }
 
     function requestChangePrice() {
@@ -202,7 +260,7 @@ const TransactionChatListing = () => {
             setInputMessage(null);
             setPicturePreview(false);
             setPictureBlob(null);
-            // getMessages();
+            getMessagesLatest();
         })
     }
 
@@ -247,26 +305,29 @@ const TransactionChatListing = () => {
     };
 
     const handleMouseEnter = (messageId) => {
-        // document.getElementById(`delete-button-${messageId}`).style.display = "inline";
-        // document.getElementById(`message-${messageId}`).style.marginLeft="5px";
+        if (purchaseRequestRecord.enable_send_message) {
+            document.getElementById(`delete-button-${messageId}`).style.display = "inline";
+            document.getElementById(`message-${messageId}`).style.marginLeft="5px";
+        }
     }
     
     const handleMouseLeave = (messageId) => {
-        // document.getElementById(`delete-button-${messageId}`).style.display = "none";
-        // document.getElementById(`message-${messageId}`).style.removeProperty('margin-left');
+        document.getElementById(`delete-button-${messageId}`).style.display = "none";
+        document.getElementById(`message-${messageId}`).style.removeProperty('margin-left');
     }
 
     const deleteMessage = (message) => {
-        // setDeletingMessage(message);
-        // withTokenRequest.post('/deleteMessage', {
-        //     user_id: localStorage.getItem('user_id'),
-        //     id: message
-        // }, {
-        //     headers: requestHeaders
-        // }).then(() => {
-        //     setDeletingMessage(null);
-        //     getMessages(otherUserId);
-        // })
+        setDeletingMessage(message);
+        withTokenRequest.post('/deleteMessagePurchaseRequest', {
+            message_id: message,
+            purchase_request_id: purchaseRequestId,
+            sender_id: localStorage.getItem('user_id'),
+        }, {
+            headers: requestHeaders
+        }).then(() => {
+            setDeletingMessage(null);
+            getMessages();
+        })
     }
 
     const mainContents = {
@@ -304,7 +365,7 @@ const TransactionChatListing = () => {
         border: 'solid black',
         width: '100%',
         position: 'relative',
-        height: '800px'
+        height: '900px'
     };
 
     if (!purchaseRequestRecord) {
@@ -457,7 +518,7 @@ const TransactionChatListing = () => {
                                 userName={otherName}
                             />
                         </ConversationHeader>
-                            <MessageList style={{height: '600px'}}>
+                            <MessageList style={{height: '800px'}}>
                             {messageGroups.map((group, index) => (
                                 <>
                                 {<MessageSeparator content={group.date}/>}
@@ -470,7 +531,7 @@ const TransactionChatListing = () => {
                                                     style={{ display: 'none', cursor: 'pointer', 'margin-right': '0px', 'margin-left': 'auto' }}
                                                     onClick={() => {
                                                         if (window.confirm('Are you sure you want to delete?')) {
-                                                        deleteMessage(message.id);
+                                                            deleteMessage(message.id);
                                                         }
                                                     }}
                                                 />
@@ -482,7 +543,7 @@ const TransactionChatListing = () => {
                                                 position: 'single',
                                                 }}
                                                 >
-                                                    <Message.Footer sentTime={message.created_at.split(' ')[1]} />
+                                                    <Message.Footer sentTime={message.created_at.split('.')[0].split('T')[1]} />
                                                 </Message>
                                             </div>
                                         )}
@@ -493,7 +554,7 @@ const TransactionChatListing = () => {
                                                     style={{ display: 'none', cursor: 'pointer', 'margin-right': '0px', 'margin-left': 'auto' }}
                                                     onClick={() => {
                                                         if (window.confirm('Are you sure you want to delete?')) {
-                                                        deleteMessage(message.id);
+                                                            deleteMessage(message.id);
                                                         }
                                                     }}
                                                 />
@@ -503,10 +564,9 @@ const TransactionChatListing = () => {
                                                 direction: 'outgoing',
                                                 position: 'single',
                                                 }}
-                                                // onClick={() => showPictureOriginal(message.picture)}
                                             >
-                                                <Message.ImageContent src={message.picture} alt="picture" width={300} />
-                                                <Message.Footer sentTime={message.created_at.split(' ')[1]} />
+                                                <Message.ImageContent src={`data:image/jpeg;base64,${message.picture}`} alt="picture" width={300} />
+                                                <Message.Footer sentTime={message.created_at.split('.')[0].split('T')[1]} />
                                             </Message>
                                             </div>
                                         )}
@@ -519,7 +579,7 @@ const TransactionChatListing = () => {
                                                             style={{ display: 'none', cursor: 'pointer', 'margin-right': '0px', 'margin-left': 'auto' }}
                                                             onClick={() => {
                                                                 if (window.confirm('Are you sure you want to delete?')) {
-                                                                deleteMessage(message.id);
+                                                                    deleteMessage(message.id);
                                                                 }
                                                             }}
                                                         />
@@ -529,9 +589,8 @@ const TransactionChatListing = () => {
                                                         direction: 'outgoing',
                                                         position: 'single',
                                                         }}
-                                                        // onClick={() => showPictureOriginal(message.picture)}
                                                     >
-                                                        <Message.ImageContent src={message.picture} alt="picture" width={300} />
+                                                        <Message.ImageContent src={`data:image/jpeg;base64,${message.picture}`} alt="picture" width={300} />
                                                     </Message>
                                                     </div>
                                                     <Message
@@ -540,7 +599,7 @@ const TransactionChatListing = () => {
                                                             direction: 'outgoing',
                                                             position: 'bottom',
                                                         }}
-                                                    ><Message.Footer sentTime={message.created_at.split(' ')[1]} />
+                                                    ><Message.Footer sentTime={message.created_at.split('.')[0].split('T')[1]} />
                                                     </Message>
                                                 </div>
                                             </>
@@ -553,7 +612,7 @@ const TransactionChatListing = () => {
                                                 position: 'single',
                                                 }}
                                                 >
-                                                    <Message.Footer sender={message.created_at.split(' ')[1]} />
+                                                    <Message.Footer sender={message.created_at.split('.')[0].split('T')[1]} />
                                                 </Message>
                                         )}
                                         {message.sender_id != localStorage.getItem('user_id') && message.message == null && message.picture && (
@@ -562,10 +621,9 @@ const TransactionChatListing = () => {
                                                 direction: 'incoming',
                                                 position: 'single',
                                                 }}
-                                                // onClick={() => showPictureOriginal(message.picture)}
                                             >
-                                                <Message.ImageContent src={message.picture} alt="picture" width={300} />
-                                                <Message.Footer sender={message.created_at.split(' ')[1]} />
+                                                <Message.ImageContent src={`data:image/jpeg;base64,${message.picture}`} alt="picture" width={300} />
+                                                <Message.Footer sender={message.created_at.split('.')[0].split('T')[1]} />
                                             </Message>
                                         )}
                                         {message.sender_id != localStorage.getItem('user_id') && message.message != null && message.picture && (
@@ -575,9 +633,8 @@ const TransactionChatListing = () => {
                                                 direction: 'incoming',
                                                 position: 'single',
                                                 }}
-                                                // onClick={() => showPictureOriginal(message.picture)}
                                                 >
-                                                    <Message.ImageContent src={message.picture} alt="picture" width={300} />
+                                                    <Message.ImageContent src={`data:image/jpeg;base64,${message.picture}`} alt="picture" width={300} />
                                                 </Message>
                                                 <Message
                                                     model={{
@@ -586,7 +643,7 @@ const TransactionChatListing = () => {
                                                         position: 'bottom',
                                                     }}
                                                 >
-                                                    <Message.Footer sender={message.created_at.split(' ')[1]} />
+                                                    <Message.Footer sender={message.created_at.split('.')[0].split('T')[1]} />
                                                 </Message>
                                             </> 
                                         )}
