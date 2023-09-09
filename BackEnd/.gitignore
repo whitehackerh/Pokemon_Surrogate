@@ -10,6 +10,7 @@ db.sqlite3
 /BackEndApi/media/profile
 /BackEndApi/media/listing
 /BackEndApi/media/message_purchase_request
+/BackEndApi/media/request
 /staticfiles
 settings_local.py
 
