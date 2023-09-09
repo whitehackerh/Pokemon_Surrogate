@@ -31,6 +31,7 @@ from api.Views.SendMessagePurchaseRequestView import SendMessagePurchaseRequestV
 from api.Views.GetMessagesPurchaseRequestView import GetMessagesPurchaseRequestView
 from api.Views.SetReadMessagesPurchaseRequestView import SetReadMessagesPurchaseRequestView
 from api.Views.DeleteMessagePurchaseRequestView import DeleteMessagePurchaseRequestView
+from api.Views.SetRequestView import SetRequestView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -63,5 +64,6 @@ urlpatterns = [
     path('sendMessagePurchaseRequest', SendMessagePurchaseRequestView.as_view(), name='sendMessagePurchaseRequest'),
     path('getMessagesPurchaseRequest', GetMessagesPurchaseRequestView.as_view(), name='getMessagesPurchaseRequest'),
     path('setReadMessagesPurchaseRequest', SetReadMessagesPurchaseRequestView.as_view(), name='setReadMessagesPurchaseRequest'),
-    path('deleteMessagePurchaseRequest', DeleteMessagePurchaseRequestView.as_view(), name='deleteMessagePurchaseRequest')
+    path('deleteMessagePurchaseRequest', DeleteMessagePurchaseRequestView.as_view(), name='deleteMessagePurchaseRequest'),
+    path('setRequest', SetRequestView.as_view(), name='setRequest')
 ]
