@@ -11,7 +11,8 @@ const HomeBar = () => {
   const homeBarContentStyle = {
     fontSize: '20px',
     fontFamily: 'Century Gothic',
-    color: 'white'
+    color: 'white',
+    'margin-right': '40px'
   };
 
   return (
@@ -21,6 +22,7 @@ const HomeBar = () => {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               <div style={{textAlign: 'center'}}>
                 <IconButton onClick={() => navigate('/marketSales')} style={homeBarContentStyle}>Market Sales</IconButton>
+                <IconButton onClick={() => navigate('/requestList')} style={homeBarContentStyle}>Request List</IconButton>
               </div>
             </Typography>
           </Toolbar>
