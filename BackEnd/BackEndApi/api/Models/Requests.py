@@ -1,4 +1,10 @@
 from django.db import models
+from api.Enums.ResponseCodes import ResponseCodes
+from api.Enums.RequestStatus import RequestStatus
+from api.Exceptions.CustomExceptions import CustomExceptions
+from django.db.models import Subquery, OuterRef
+from api.Models.GameTitles import GameTitles
+from api.Models.RequestPictures import RequestPictures
 
 class Requests(models.Model):
     client_id = models.IntegerField()
@@ -15,3 +21,76 @@ class Requests(models.Model):
     class Meta:
         app_label = 'api'
         db_table = 'requests'
+
+    def getRequestsPersonalCount(self, client_id, statuses):
+        try:
+            return Requests.objects.filter(client_id=client_id, status__in=statuses).count()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def getRequestsPublicCount(self):
+        try:
+            return Requests.objects.filter(status=RequestStatus.ACCEPTING).count()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+
+    def getRequestsPersonal(self, client_id, statuses, offset, limit):
+        try:
+            from api.models import Users
+            return Requests.objects.filter(
+                client_id=client_id,
+                status__in=statuses
+            ).annotate(
+                smallest_sort_no=Subquery(
+                    RequestPictures.objects.filter(
+                        request_id=OuterRef('id'),
+                        deleted_at__isnull=True
+                    ).order_by('sort_no').values('sort_no')[:1]
+                ),
+                path=Subquery(
+                    RequestPictures.objects.filter(
+                        request_id=OuterRef('id'),
+                        sort_no=OuterRef('smallest_sort_no'),
+                        deleted_at__isnull=True
+                    ).values('path')[:1]
+                ),
+                game_title=Subquery(
+                    GameTitles.objects.filter(
+                        id=OuterRef('game_title_id')
+                    ).values('title')[:1]
+                ),
+                nickname=Subquery(
+                    Users.objects.filter(
+                        id=client_id
+                    ).values('nickname')[:1]
+                )
+            ).order_by('-id')[offset:offset+limit].all()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+    
+    def getRequestsPublic(self, offset, limit):
+        try:
+            return Requests.objects.filter(
+                status=RequestStatus.ACCEPTING
+            ).annotate(
+                smallest_sort_no=Subquery(
+                    RequestPictures.objects.filter(
+                        request_id=OuterRef('id'),
+                        deleted_at__isnull=True
+                    ).order_by('sort_no').values('sort_no')[:1]
+                ),
+                path=Subquery(
+                    RequestPictures.objects.filter(
+                        request_id=OuterRef('id'),
+                        sort_no=OuterRef('smallest_sort_no'),
+                        deleted_at__isnull=True
+                    ).values('path')[:1]
+                ),
+                game_title=Subquery(
+                    GameTitles.objects.filter(
+                        id=OuterRef('game_title_id')
+                    ).values('title')[:1]
+                ),
+            ).order_by('-id')[offset:offset+limit].all()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
