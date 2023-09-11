@@ -34,6 +34,7 @@ from api.Views.DeleteMessagePurchaseRequestView import DeleteMessagePurchaseRequ
 from api.Views.SetRequestView import SetRequestView
 from api.Views.GetRequestsSummaryView import GetRequestsSummaryView
 from api.Views.GetRequestsView import GetRequestsView
+from api.Views.GetRequestDetailView import GetRequestDetailView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -69,5 +70,6 @@ urlpatterns = [
     path('deleteMessagePurchaseRequest', DeleteMessagePurchaseRequestView.as_view(), name='deleteMessagePurchaseRequest'),
     path('setRequest', SetRequestView.as_view(), name='setRequest'),
     path('getRequestsSummary', GetRequestsSummaryView.as_view(), name='getRequestsSummary'),
-    path('getRequests', GetRequestsView.as_view(), name='getRequests')
+    path('getRequests', GetRequestsView.as_view(), name='getRequests'),
+    path('getRequestDetail', GetRequestDetailView.as_view(), name='getRequestDetail')
 ]

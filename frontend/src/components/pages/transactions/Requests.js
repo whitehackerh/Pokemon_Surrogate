@@ -74,6 +74,7 @@ const Requests = () => {
   }
 
   const clickRequest = (requestId) => {
+    navigate('/requestDetail', { state: {requestId: requestId, from: 'requests'}});
   }
 
   const mainContents = {
