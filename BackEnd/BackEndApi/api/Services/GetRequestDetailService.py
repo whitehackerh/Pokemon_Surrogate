@@ -34,7 +34,7 @@ class GetRequestDetailService(BaseService):
             defaultPicture = True            
         return {
             'request_id': request_id,
-            'client_info': {
+            'client': {
                 'user_id': request.client_id,
                 'profile_picture': ServiceUtils.getBase64FromPath(os.path.join(settings.MEDIA_ROOT, request.clients_profile_picture)),
                 'nickname': request.nickname
@@ -44,11 +44,11 @@ class GetRequestDetailService(BaseService):
                 'edit': request.client_id == user_id and request.status == RequestStatus.ACCEPTING,
                 'accept': user_id != None and user_id != request.client_id and request.status == RequestStatus.ACCEPTING
             },
-            'game_info': {
+            'game': {
                 'id': request.game_title_id,
                 'title': request.game_title
             },
-            'category_info': {
+            'category': {
                 'id': request.category,
                 'name': ServiceUtils.getListingCategory(request.category)
             },

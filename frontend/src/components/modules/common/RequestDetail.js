@@ -28,23 +28,23 @@ const RequestDetail = () => {
             setPictures(data.pictures);       
             setRecord({
                 seller_id: data.seller_id,
-                client_info: {
-                    user_id: data.client_info.user_id,
-                    profile_picture: data.client_info.profile_picture,
-                    nickname: data.client_info.nickname
+                client: {
+                    user_id: data.client.user_id,
+                    profile_picture: data.client.profile_picture,
+                    nickname: data.client.nickname
                 },
                 status: data.status,
                 enables: {
                     edit: data.enables.edit,
                     accept: data.enables.accept
                 },
-                game_info: {
-                    id: data.game_info.id,
-                    title: data.game_info.title
+                game: {
+                    id: data.game.id,
+                    title: data.game.title
                 },
-                category_info: {
-                    id: data.category_info.id,
-                    name: data.category_info.name
+                category: {
+                    id: data.category.id,
+                    name: data.category.name
                 },
                 request_title: data.request_title,
                 description: data.description.split('\n'),
@@ -124,11 +124,11 @@ const RequestDetail = () => {
                         <TableBody>
                             <TableRow>
                                 <TableCell style={keyColumnStyle}>Game Title</TableCell>
-                                <TableCell>{record.game_info.title}</TableCell>
+                                <TableCell>{record.game.title}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell style={keyColumnStyle}>Category</TableCell>
-                                <TableCell>{record.category_info.name}</TableCell>
+                                <TableCell>{record.category.name}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell style={keyColumnStyle}>Price</TableCell>
@@ -140,8 +140,8 @@ const RequestDetail = () => {
                 <br /><br />
                 <div style={{fontWeight: 'bold'}}>Client</div><br />
                 <div style={{border: '1px solid black', height: '50px', width: '30%', display: 'flex'}}>
-                    <img src={`data:image/jpeg;base64,${record.client_info.profile_picture}`} style={profilePictureStyle}></img>
-                    <div style={{fontWeight: 'bold'}}>&nbsp;{record.client_info.nickname}</div>
+                    <img src={`data:image/jpeg;base64,${record.client.profile_picture}`} style={profilePictureStyle}></img>
+                    <div style={{fontWeight: 'bold'}}>&nbsp;{record.client.nickname}</div>
                 </div><br /><br />
                 {buttons}
             </div>
