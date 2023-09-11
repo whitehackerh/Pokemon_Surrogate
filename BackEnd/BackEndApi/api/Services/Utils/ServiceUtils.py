@@ -89,3 +89,9 @@ class ServiceUtils:
     
     def isEnableSendMessagePurchaseRequest(status):
         return status <= PurchaseRequestStatus.DELIVERED
+
+    def getUserId(request):
+        if request.user is not None and request.user.id:
+            return request.user.id
+        else:
+            return None

@@ -15,3 +15,9 @@ class RequestPictures(models.Model):
     class Meta:
         app_label = 'api'
         db_table = 'request_pictures'
+
+    def getRequestPictures(self, request_id):
+        try:
+            return RequestPictures.objects.filter(request_id=request_id, deleted_at__isnull=True).order_by('sort_no')
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)

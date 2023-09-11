@@ -25,6 +25,7 @@ import TransactionChatListing from './components/pages/transactions/TransactionC
 import EditRequest from './components/pages/transactions/EditRequest';
 import Requests from './components/pages/transactions/Requests';
 import RequestList from './components/pages/requests/RequestList';
+import RequestDetail from './components/modules/common/RequestDetail';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -72,6 +73,7 @@ const App = () => {
             <Route path='/requests' element={<Requests />} />
             <Route path='/editRequest' element={<EditRequest />} />
             <Route path='/requestList' element={<RequestList />} />
+            <Route path='/requestDetail' element={<RequestDetail />} />
           </Route>
         </Routes>
       </BrowserRouter>

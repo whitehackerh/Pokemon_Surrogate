@@ -44,6 +44,7 @@ const RequestList = () => {
     }
 
     const clickRequest = (requestId) => {
+        navigate('/requestDetail', { state: {requestId: requestId, from: 'requestList'}});
     };
 
     const mainContents = {

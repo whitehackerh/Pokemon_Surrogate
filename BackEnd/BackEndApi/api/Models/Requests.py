@@ -94,3 +94,28 @@ class Requests(models.Model):
             ).order_by('-id')[offset:offset+limit].all()
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def getRequestDetail(self, request_id):
+        try:
+            from api.models import Users
+            return Requests.objects.filter(
+                id = request_id
+            ).annotate(
+                game_title=Subquery(
+                    GameTitles.objects.filter(
+                        id=OuterRef('game_title_id')
+                    ).values('title')[:1]
+                ),
+                nickname=Subquery(
+                    Users.objects.filter(
+                        id=OuterRef('client_id')
+                    ).values('nickname')[:1]
+                ),
+                clients_profile_picture=Subquery(
+                    Users.objects.filter(
+                        id=OuterRef('client_id')
+                    ).values('profile_picture')[:1]
+                )
+            ).all()
+        except Exception as e:
+            raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
