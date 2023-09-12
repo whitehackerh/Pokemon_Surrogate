@@ -3,7 +3,9 @@ import os
 from api.Enums.ListingStatus import ListingStatus
 from api.Enums.ListingCategory import ListingCategory
 from api.Enums.PurchaseRequestStatus import PurchaseRequestStatus
+from api.Enums.RequestStatus import RequestStatus
 from api.Models.Listings import Listings
+from api.Models.Requests import Requests
 
 class ServiceUtils:
     def makeDir(path):
@@ -95,3 +97,8 @@ class ServiceUtils:
             return request.user.id
         else:
             return None
+        
+    def isEnableUpdateRequest(request_id, client_id):
+        model = Requests()
+        record = model.getRequestDetail(request_id)
+        return record.count() == 1 and record[0].client_id == client_id and record[0].status == RequestStatus.ACCEPTING

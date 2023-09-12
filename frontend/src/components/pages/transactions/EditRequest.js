@@ -13,7 +13,6 @@ import FormLabel from '@mui/material/FormLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
-import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -37,7 +36,7 @@ const EditRequest = () => {
     useEffect(() => {
         getGameTitles();
         if (requestId) {
-            
+            getRequestDetail();
         }
     }, []);
 
@@ -46,6 +45,41 @@ const EditRequest = () => {
         }).then((res) => {
             setGameTitles(res.data.data.gameTitles);
         })
+    }
+
+    function getRequestDetail() {
+        noTokenRequest.post('/getRequestDetail', {
+            request_id: requestId,
+        }).then((res) => {
+            const data = res.data.data;
+            if (!data.isDefaultPicture) {
+                const pictureFiles = data.pictures.map(base64Data => {
+                    const blob = dataURLtoBlob(base64Data);
+                    const file = new File([blob], 'picture.png', { type: 'image/png' });
+                    const dataUrl = URL.createObjectURL(file);
+                    return { file, url: dataUrl };
+                });
+                setPictures(pictureFiles);
+            }
+            setGameTitle({ id: data.game.id, title: data.game.title });
+            setCategory(data.category.id);
+            setRequestTitle(data.request_title);
+            setDescription(data.description);
+            setMinPrice(data.min_price);
+            setMaxPrice(data.max_price);
+            setPageTitle('Edit Request');
+            setRegisterButtonText('Update');
+        })
+    }
+
+    function dataURLtoBlob(base64Data) {
+        const byteString = atob(base64Data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < byteString.length; i++) {
+          uint8Array[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([uint8Array], { type: 'image/png' });
     }
 
     const handlePictureUpload = (event) => {
@@ -115,7 +149,7 @@ const EditRequest = () => {
             {
                 headers: multipartFormData
             }).then(() => {
-                navigate('/home');
+                navigate('/requests');
             }).catch((error) => {
                 console.log(error);
             })

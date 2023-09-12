@@ -64,6 +64,53 @@ class SetRequestService(BaseService):
         return None
 
     def __updateRequest(self, request):
+        client_id = ServiceUtils.getUserId(request)
+        if not client_id:
+            raise CustomExceptions('Invalid Data', ResponseCodes.INVALID_DATA)
+        request_id = request.data.get('request_id')
+        if not ServiceUtils.isEnableUpdateRequest(request_id, client_id):
+            raise CustomExceptions('Unauthorized Error.', ResponseCodes.INTERNAL_SERVER_ERROR)
+        requestsModel = Requests()
+        requestsModel.updateRequest(request)
+        requestPicturesModel = RequestPictures()
+        oldRequestPictures = requestPicturesModel.getRequestPictures(request_id)
+
+        oldPicturePaths = []
+        for oldPicture in oldRequestPictures:
+            oldPicturePaths.append(oldPicture.path)
+        requestPicturesModel.deleteRequestPictures(request_id)
+
+        if not request.FILES:
+            self.__registerDefaultPicture(request_id, client_id)
+        else:
+            ServiceUtils.makeDir(os.path.join(settings.MEDIA_ROOT, Path.REQUEST_PICTURE_DIR))
+            requestPicturesParams = []
+            pictureNames = []
+            for oldPicture in oldPicturePaths:
+                pictureNames.append(os.path.basename)
+            for index in range(1, 11):
+                if f'picture{index}' in request.FILES:
+                    filename = f'{request_id}_{uuid.uuid4().hex}.png'
+                    while any(filename == pictureName for pictureName in pictureNames):
+                        filename = f'{request_id}_{uuid.uuid4().hex}.png'
+                    requestPicturesParams.append({
+                        'request_id': request_id,
+                        'client_id': client_id,
+                        'path': os.path.join(Path.REQUEST_PICTURE_DIR, filename),
+                        'sort_no': index
+                    })
+                    pictureNames.append(filename)
+            RequestPictures.objects.bulk_create([RequestPictures(**requestPicturesParam) for requestPicturesParam in requestPicturesParams])
+            for requestPicturesParam in requestPicturesParams:
+                with open(os.path.join(settings.MEDIA_ROOT, requestPicturesParam['path']), 'wb') as f:
+                    for chunk in request.FILES.get(f"picture{requestPicturesParam['sort_no']}").chunks():
+                        f.write(chunk)
+        
+        for oldPicture in oldPicturePaths:
+            targetPath = os.path.join(settings.MEDIA_ROOT, oldPicture)
+            if os.path.exists(targetPath) and oldPicture != Path.LOGO:
+                os.remove(targetPath)
+
         return None
     
     def __registerDefaultPicture(self, request_id, client_id):

@@ -21,8 +21,10 @@ const RequestDetail = () => {
     }, []);
 
     function getRequestDetail() {
-        noTokenRequest.post('/getRequestDetail', {
+        withTokenRequest.post('/getRequestDetail', {
             request_id: requestId
+        }, {
+            headers: requestHeaders
         }).then((res) => {
             const data = res.data.data;
             setPictures(data.pictures);       
@@ -52,6 +54,10 @@ const RequestDetail = () => {
                 max_price: data.max_price,
             });
         })
+    }
+
+    function clickEdit() {
+        navigate('/editRequest', { state: {requestId: requestId}});
     }
 
     const mainContents = {
@@ -89,7 +95,7 @@ const RequestDetail = () => {
     if (record.enables.edit) {
         buttons = <>
             <div style={{display: 'flex'}}>
-                <Button variant="contained">Edit</Button>&nbsp;&nbsp;&nbsp;&nbsp;
+                <Button variant="contained" onClick={clickEdit}>Edit</Button>&nbsp;&nbsp;&nbsp;&nbsp;
                 <br /><br />
                 {/* <ConfirmDialog text='remove' message='Are you sure you want to remove this request?' callback={removeRequest}/> */}
             </div>

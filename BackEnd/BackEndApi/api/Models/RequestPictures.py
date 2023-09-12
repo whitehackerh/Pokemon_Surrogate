@@ -21,3 +21,13 @@ class RequestPictures(models.Model):
             return RequestPictures.objects.filter(request_id=request_id, deleted_at__isnull=True).order_by('sort_no')
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def deleteRequestPictures(self, request_id):
+        try:
+            queryset = RequestPictures.objects.filter(request_id=request_id, deleted_at__isnull=True)
+            time = timezone.now()
+            for query in queryset:
+                query.deleted_at = time
+            RequestPictures.objects.bulk_update(queryset, ['deleted_at'])
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
