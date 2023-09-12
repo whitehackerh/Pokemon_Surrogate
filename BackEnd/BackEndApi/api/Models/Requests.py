@@ -119,3 +119,17 @@ class Requests(models.Model):
             ).all()
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def updateRequest(self, request):
+        try:
+            requestRecord = Requests.objects.get(id=request.data.get('request_id'))
+            requestRecord.game_title_id = request.data.get('game_title_id')
+            requestRecord.category = request.data.get('category')
+            requestRecord.request_title = request.data.get('request_title')
+            requestRecord.description = request.data.get('description')
+            requestRecord.min_price = request.data.get('min_price')
+            requestRecord.max_price = request.data.get('max_price')
+            requestRecord.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+    
