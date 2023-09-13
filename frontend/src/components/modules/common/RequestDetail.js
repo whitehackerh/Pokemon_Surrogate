@@ -56,6 +56,16 @@ const RequestDetail = () => {
         })
     }
 
+    function removeRequest() {
+        withTokenRequest.post('/removeRequest', {
+            request_id: requestId
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getRequestDetail();
+        })
+    }
+
     function clickEdit() {
         navigate('/editRequest', { state: {requestId: requestId}});
     }
@@ -97,7 +107,7 @@ const RequestDetail = () => {
             <div style={{display: 'flex'}}>
                 <Button variant="contained" onClick={clickEdit}>Edit</Button>&nbsp;&nbsp;&nbsp;&nbsp;
                 <br /><br />
-                {/* <ConfirmDialog text='remove' message='Are you sure you want to remove this request?' callback={removeRequest}/> */}
+                <ConfirmDialog text='remove' message='Are you sure you want to remove this request?' callback={removeRequest}/>
             </div>
         </>
     } else if (record.enables.accept) {

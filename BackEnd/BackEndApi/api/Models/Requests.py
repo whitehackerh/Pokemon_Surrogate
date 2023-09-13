@@ -133,3 +133,10 @@ class Requests(models.Model):
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
     
+    def updateRequestStatus(self, id, status):
+        try:
+            requestRecord = Requests.objects.get(id=id)
+            requestRecord.status = status
+            requestRecord.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
