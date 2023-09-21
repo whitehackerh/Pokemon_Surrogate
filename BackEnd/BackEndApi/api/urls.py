@@ -36,6 +36,7 @@ from api.Views.GetRequestsSummaryView import GetRequestsSummaryView
 from api.Views.GetRequestsView import GetRequestsView
 from api.Views.GetRequestDetailView import GetRequestDetailView
 from api.Views.RemoveRequestView import RemoveRequestView
+from api.Views.SetAcceptView import SetAcceptView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -73,5 +74,6 @@ urlpatterns = [
     path('getRequestsSummary', GetRequestsSummaryView.as_view(), name='getRequestsSummary'),
     path('getRequests', GetRequestsView.as_view(), name='getRequests'),
     path('getRequestDetail', GetRequestDetailView.as_view(), name='getRequestDetail'),
-    path('removeRequest', RemoveRequestView.as_view(), name='removeRequest')
+    path('removeRequest', RemoveRequestView.as_view(), name='removeRequest'),
+    path('setAccept', SetAcceptView.as_view(), name='setAccept')
 ]
