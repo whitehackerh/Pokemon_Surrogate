@@ -70,6 +70,17 @@ const RequestDetail = () => {
         navigate('/editRequest', { state: {requestId: requestId}});
     }
 
+    function setAccept() {
+        withTokenRequest.post('/setAccept', {
+            request_id: requestId
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            // TODO navigation
+            navigate('/home');
+        })
+    }
+
     const mainContents = {
         float: 'left',
         margin: '10px',
@@ -111,7 +122,9 @@ const RequestDetail = () => {
             </div>
         </>
     } else if (record.enables.accept) {
- 
+        buttons = <>
+            <ConfirmDialog text='Accept this request' message='Are you sure you want to accept this request?' callback={setAccept}/>
+        </>;
     }
 
     return (

@@ -10,6 +10,7 @@ from api.Models.ListingPictures import ListingPictures
 from api.Models.PurchaseRequests import PurchaseRequests
 from api.Models.Requests import Requests
 from api.Models.RequestPictures import RequestPictures
+from api.Models.Accepts import Accepts
 
 __all__ = [
     'Users',
@@ -20,7 +21,8 @@ __all__ = [
     'PurchaseRequests',
     'PurchaseRequestMessages',
     'Requests',
-    'RequestPictures'
+    'RequestPictures',
+    'Accepts'
 ]
 
 class Users(AbstractUser):
