@@ -26,6 +26,7 @@ import EditRequest from './components/pages/transactions/EditRequest';
 import Requests from './components/pages/transactions/Requests';
 import RequestList from './components/pages/requests/RequestList';
 import RequestDetail from './components/modules/common/RequestDetail';
+import Accepts from './components/pages/transactions/Accepts';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -74,6 +75,7 @@ const App = () => {
             <Route path='/editRequest' element={<EditRequest />} />
             <Route path='/requestList' element={<RequestList />} />
             <Route path='/requestDetail' element={<RequestDetail />} />
+            <Route path='/accepts' element={<Accepts />} />
           </Route>
         </Routes>
       </BrowserRouter>

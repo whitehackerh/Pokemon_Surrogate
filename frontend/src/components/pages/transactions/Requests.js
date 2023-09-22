@@ -15,6 +15,8 @@ const Requests = () => {
   const [page, setPage] = useState(1);
   const [requestStatus, setRequestStatus] = useState(0);
   const [requests, setRequests] = useState(null);
+  const [acceptStatus, setAcceptStatus] = useState(null);
+  const [accepts, setAccepts] = useState(null);
   requestHeaders.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
 
   useEffect(() => {
@@ -49,18 +51,51 @@ const Requests = () => {
         setRequests(res.data.data.requests);
       });
   }
+  function loadAccepts(page, status) {
+    setAcceptStatus(status);
+    getAcceptsSummary(status);
+    getAccepts(page, status);
+  }
+  function getAcceptsSummary(status) {
+    withTokenRequest.post('/getAcceptsSummary', {
+      status: status,
+      client: true
+    }, {
+      headers: requestHeaders
+    })
+    .then((res) => {
+      setTotalPages(res.data.data.pages);
+    });
+  }
+  function getAccepts(page, status) {
+    withTokenRequest.post('/getAccepts', {
+      status: status,
+      client: true,
+      page: page
+    }, {
+      headers: requestHeaders
+    })
+    .then((res) => {
+      setAccepts(res.data.data.accepts);
+    });
+  }
 
   function changeTab(event, value) {
     setTab(value);
     setPage(1);
     setRequests(null);
+    setAccepts(null);
     if (value === 0) {
+      setAcceptStatus(null);
       loadRequestsNotTransaction(1, 0);
     } else if (value == 1) {
       setRequestStatus(null);
+      loadAccepts(1, 0);
     } else if (value == 2) {
       setRequestStatus(null);
+      loadAccepts(1, 4);
     } else if (value === 3) {
+      setAcceptStatus(null);
       loadRequestsNotTransaction(1, 2);
     }
   }
@@ -68,13 +103,21 @@ const Requests = () => {
   function movePage(event, value) {
     setPage(value);
     setRequests(null);
+    setAccepts(null);
     if (requestStatus != null) {
       loadRequestsNotTransaction(value, requestStatus);
+    } else if (acceptStatus != null) {
+      loadAccepts(value, acceptStatus);
     }
   }
 
   const clickRequest = (requestId) => {
     navigate('/requestDetail', { state: {requestId: requestId, from: 'requests'}});
+  }
+  
+  const clickAccept = (acceptId) => {
+    // TODO Navigate
+    navigate('/home');
   }
 
   const mainContents = {
@@ -162,12 +205,41 @@ const Requests = () => {
         </>
   );
 
-  const transactions = () => (
+  const transactions = (accepts) => (
     <>
+      {accepts.map((accept, index) => (
+          <div key={accept.accept_id} style={parentFlameStyle}
+              onClick={() => clickAccept(accept.accept_id)}>
+              <div style={childFlameStyle}>
+                  <div style={containerStyle}>
+                      <div style={imageContainerStyle}>
+                          <img
+                            src={`data:image/jpeg;base64,${accept.picture}`}
+                            alt="picture"
+                            style={pictureStyle}
+                          ></img>
+                      </div>
+                  </div>
+                  <div style={requestMainStyle}>
+                      <h4 style={{ margin: 0 }}>{accept.request_title}</h4>
+                      <div style={gameTitleStyle}>
+                          <h5 style={{ margin: 0 }}>{accept.game_title}</h5>
+                      </div>
+                  </div>
+                  <div style={priceStyle}>
+                    {accept.price ? (
+                      `$${accept.price}`
+                    ) : (
+                      `$${accept.min_price} - $${accept.max_price}`
+                    )}
+                  </div>
+              </div>
+          </div>
+        ))}
     </>
   );
 
-  if ((requestStatus != null && !requests)) {
+  if ((requestStatus != null && !requests) || (acceptStatus != null && !accepts)) {
     return <></>;
   }
   return (
@@ -189,11 +261,13 @@ const Requests = () => {
         {tab === 1 && (
           <Box>
             <br /><br />
+            {accepts ? (transactions(accepts)) : null}
           </Box>
         )}
         {tab === 2 && (
           <Box>
             <br /><br />
+            {accepts ? (transactions(accepts)) : null}
           </Box>
         )}
         {tab === 3 && (
