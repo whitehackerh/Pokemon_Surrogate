@@ -140,7 +140,7 @@ const RequestList = () => {
     return (
         <>
             <div style={mainContents}>
-                <h2>Now On Sale</h2>
+                <h2>Looking for</h2>
                 <Box>
                     <br /><br />
                     {requestList(requests)}

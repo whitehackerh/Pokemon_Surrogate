@@ -15,6 +15,7 @@ const SideBar_Transactions = () => {
             <Link to="/purchaseProducts">Purchased Products</Link><br /><br />
             <Link to="/editListing">New Listing</Link><br /><br />
             <Link to="/requests">Requests</Link><br /><br />
+            <Link to='/accepts'>Accepts</Link><br /><br />
             <Link to='/editRequest'>New Request</Link><br /><br />
         </div>
     );
