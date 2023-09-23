@@ -4,6 +4,7 @@ from api.Enums.ListingStatus import ListingStatus
 from api.Enums.ListingCategory import ListingCategory
 from api.Enums.PurchaseRequestStatus import PurchaseRequestStatus
 from api.Enums.RequestStatus import RequestStatus
+from api.Enums.AcceptStatus import AcceptStatus
 from api.Models.Listings import Listings
 from api.Models.Requests import Requests
 
@@ -102,3 +103,49 @@ class ServiceUtils:
         model = Requests()
         record = model.getRequestDetail(request_id)
         return record.count() == 1 and record[0].client_id == client_id and record[0].status == RequestStatus.ACCEPTING
+    
+    def isEnableCancelAccept(status, price_in_negotiation):
+        return (status == AcceptStatus.PRICE_NEGOTIATION and not price_in_negotiation) or status == AcceptStatus.AWAITING_PAYMENT or status == AcceptStatus.AWAITING_DELIVERY
+    
+    def isEnableRequestChangePriceAccept(status, user_id, client_id, contractor_id, price_in_negotiation):
+        if user_id == client_id:
+            return (status == AcceptStatus.PRICE_NEGOTIATION and not price_in_negotiation) or status == AcceptStatus.AWAITING_PAYMENT
+        elif user_id == contractor_id:
+            return False
+        else:
+            return False
+        
+    def isEnableResponseChangePriceAccept(status, user_id, client_id, contractor_id, price_in_negotiation):
+        if user_id == client_id:
+            return False
+        elif user_id == contractor_id and price_in_negotiation:
+            return status == AcceptStatus.PRICE_NEGOTIATION
+        else:
+            return False
+    
+    def isEnablePaymentAccept(status, user_id, client_id, contractor_id):
+        if user_id == client_id:
+            return status == AcceptStatus.AWAITING_PAYMENT
+        elif user_id == contractor_id:
+            return False
+        else:
+            return None
+    
+    def isEnableDeliverAccept(status, user_id, client_id, contractor_id):
+        if user_id == client_id:
+            return False
+        elif user_id == contractor_id:
+            return status == AcceptStatus.AWAITING_DELIVERY
+        else:
+            return None
+        
+    def isEnableCompleteAccept(status, user_id, client_id, contractor_id):
+        if user_id == client_id:
+            return status == AcceptStatus.DELIVERED
+        elif user_id == contractor_id:
+            return False
+        else:
+            return None
+    
+    def isEnableSendMessageAccept(status):
+        return status <= AcceptStatus.DELIVERED

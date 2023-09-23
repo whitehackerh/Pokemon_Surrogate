@@ -116,8 +116,7 @@ const Requests = () => {
   }
   
   const clickAccept = (acceptId) => {
-    // TODO Navigate
-    navigate('/home');
+    navigate('/transactionChatRequest', { state: {acceptId: acceptId}});
   }
 
   const mainContents = {
