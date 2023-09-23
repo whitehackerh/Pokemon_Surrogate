@@ -68,8 +68,7 @@ const Accepts = () => {
     }
 
     const clickAccept = (acceptId) => {
-        // TODO
-        navigate('/home');
+        navigate('/transactionChatRequest', { state: {acceptId: acceptId}});
     }
 
     const mainContents = {
