@@ -41,6 +41,7 @@ from api.Views.GetAcceptsSummaryView import GetAcceptsSummaryView
 from api.Views.GetAcceptsView import GetAcceptsView
 from api.Views.GetAcceptDetailView import GetAcceptDetailView
 from api.Views.RequestPriceAcceptView import RequestPriceAcceptView
+from api.Views.ResponsePriceAcceptView import ResponsePriceAcceptView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -83,5 +84,6 @@ urlpatterns = [
     path('getAcceptsSummary', GetAcceptsSummaryView.as_view(), name='getAcceptsSummary'),
     path('getAccepts', GetAcceptsView.as_view(), name='getAccepts'),
     path('getAcceptDetail', GetAcceptDetailView.as_view(), name='getAcceptDetail'),
-    path('requestPriceAccept', RequestPriceAcceptView.as_view(), name='requestPriceAccept')
+    path('requestPriceAccept', RequestPriceAcceptView.as_view(), name='requestPriceAccept'),
+    path('responsePriceAccept', ResponsePriceAcceptView.as_view(), name='responsePriceAccept')
 ]
