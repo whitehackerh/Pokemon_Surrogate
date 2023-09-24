@@ -69,8 +69,8 @@ class GetAcceptDetailService(BaseService):
                 'request_pictures': pictures,
                 'enables': {
                     'cancel': ServiceUtils.isEnableCancelAccept(accept.status, accept.price_in_negotiation),
-                    'request_change_price': ServiceUtils.isEnableRequestChangePriceAccept(accept.status, user_id, accept.client_id, accept.contractor_id, accept.price_in_negotiation),
-                    'response_change_price': ServiceUtils.isEnableResponseChangePriceAccept(accept.status, user_id, accept.client_id, accept.contractor_id, accept.price_in_negotiation),
+                    'request_price': ServiceUtils.isEnableRequestPriceAccept(accept.status, user_id, accept.client_id, accept.contractor_id, accept.price_in_negotiation),
+                    'response_price': ServiceUtils.isEnableResponsePriceAccept(accept.status, user_id, accept.client_id, accept.contractor_id, accept.price_in_negotiation),
                     'payment': ServiceUtils.isEnablePaymentAccept(accept.status, user_id, accept.client_id, accept.contractor_id),
                     'deliver': ServiceUtils.isEnableDeliverAccept(accept.status, user_id, accept.client_id, accept.contractor_id),
                     'complete': ServiceUtils.isEnableCompleteAccept(accept.status, user_id, accept.client_id, accept.contractor_id),
