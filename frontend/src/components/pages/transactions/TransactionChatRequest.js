@@ -59,21 +59,47 @@ const TransactionChatRequest = () => {
                 request_title: data.request_title,
                 description: data.description.split('\n'),
                 price: data.price,
-                price_negotiation: data.price_negotiation,
                 price_in_negotiation: inputPriceInNegotiation ? acceptRecord.price_in_negotiation : data.price_in_negotiation,
                 min_price: data.price_range.min,
                 max_price: data.price_range.max,
                 fee_id: data.fee.id,
                 fee_percentage: data.fee.percentage,
                 enable_cancel: data.enables.cancel,
-                enable_request_change_price: data.enables.request_change_price,
-                enable_response_change_price: data.enables.response_change_price,
+                enable_request_price: data.enables.request_price,
+                enable_response_price: data.enables.response_price,
                 enable_payment: data.enables.payment,
                 enable_deliver: data.enables.deliver,
                 enable_complete: data.enables.complete,
                 enable_send_message: data.enables.send_message
             });
         })
+    }
+
+    function requestPrice() {
+        withTokenRequest.post('/requestPriceAccept', {
+            accept_id: acceptId,
+            request_price: acceptRecord.price_in_negotiation,
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            setInputPriceInNegotiation(false);
+            getAcceptDetail();
+        });
+    }
+
+    function handleChange(e, newValue, setterName, setterParams) {
+        const target = e.target;
+        const value = target.value;
+        const name = target.name;
+        switch (setterName) {
+            case 'setPriceInNegotiation':
+                setInputPriceInNegotiation(true);
+                setAcceptRecord({
+                    ...acceptRecord,
+                    price_in_negotiation: value
+                });
+                break;
+            }
     }
 
     const mainContents = {
@@ -112,6 +138,25 @@ const TransactionChatRequest = () => {
                <TableCell style={keyColumnStyle}>Revenue</TableCell>
                <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>{acceptRecord.price ? (`$${acceptRecord.price - acceptRecord.price * acceptRecord.fee_percentage}`) : (`-`)}</TableCell>
             </TableRow>
+        </>
+    }
+    let requestPriceComponent = '';
+    if (acceptRecord.status <= 1) {
+        requestPriceComponent = <>
+            {acceptRecord.status == 0 && !acceptRecord.enable_response_price ? <p>Pending Approval</p> : null}
+            <div style={{display: 'flex'}}>
+                <FormControl sx={{ width: 200 }} variant="standard">
+                    <InputLabel htmlFor="standard-adornment-price">Request Price</InputLabel>
+                    <Input
+                        id="standard-adornment-price"
+                        startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                        value={acceptRecord.price_in_negotiation}
+                        onChange={(event, newValue) => {handleChange(event, newValue, 'setPriceInNegotiation', null);}}
+                        disabled={!acceptRecord.enable_request_price}
+                    />
+                </FormControl>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <Button variant="contained" disabled={!acceptRecord.enable_request_price} onClick={requestPrice}>Request</Button>
+            </div>
         </>
     }
     if (!acceptId) {
@@ -153,6 +198,10 @@ const TransactionChatRequest = () => {
                                     <TableCell style={keyColumnStyle}>Price</TableCell>
                                     <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>{acceptRecord.price ? (`$${acceptRecord.price}`) : (`T.B.D`)}</TableCell>
                                 </TableRow>
+                                <TableRow>
+                                    <TableCell style={keyColumnStyle}>Price Range</TableCell>
+                                    <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>${acceptRecord.min_price} - ${acceptRecord.max_price}</TableCell>
+                                </TableRow>
                                 {fees}
                             </TableBody>
                         </Table>
@@ -168,6 +217,7 @@ const TransactionChatRequest = () => {
                         <img src={`data:image/jpeg;base64,${acceptRecord.contractor_profile_picture}`} style={profilePictureStyle}></img>
                         <div style={{fontWeight: 'bold'}}>&nbsp;{acceptRecord.contractor_nickname}</div>
                     </div><br /><br />
+                    {requestPriceComponent}
                 </div>
             </div>
         </>

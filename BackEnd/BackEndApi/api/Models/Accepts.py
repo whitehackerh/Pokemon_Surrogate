@@ -152,3 +152,12 @@ class Accepts(models.Model):
             return queryset.all()
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def requestPrice(self, id, price):
+        try:
+            accept = Accepts.objects.get(id=id)
+            accept.price_in_negotiation = price
+            accept.status = AcceptStatus.PRICE_NEGOTIATION
+            accept.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
