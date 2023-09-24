@@ -87,6 +87,17 @@ const TransactionChatRequest = () => {
         });
     }
 
+    function responsePrice(response) {
+        withTokenRequest.post('/responsePriceAccept', {
+            accept_id: acceptId,
+            response: response
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getAcceptDetail();
+        });
+    }
+
     function handleChange(e, newValue, setterName, setterParams) {
         const target = e.target;
         const value = target.value;
@@ -131,7 +142,7 @@ const TransactionChatRequest = () => {
     if (localStorage.getItem('user_id') == acceptRecord.contractor_id) {
         fees = <>
             <TableRow>
-               <TableCell style={keyColumnStyle}>Fee {acceptRecord.fee_id ? (`${acceptRecord.fee_percentage * 100}%`) : (null)}</TableCell>
+               <TableCell style={keyColumnStyle}>Fee {acceptRecord.fee_id ? (`(${acceptRecord.fee_percentage * 100}%)`) : (null)}</TableCell>
                <TableCell style={{fontWeight: 'bold', fontSize: '20px', color: 'red'}}>{acceptRecord.price ? (`$${acceptRecord.price * acceptRecord.fee_percentage}`) : (`-`)}</TableCell>
             </TableRow>
             <TableRow>
@@ -141,7 +152,7 @@ const TransactionChatRequest = () => {
         </>
     }
     let requestPriceComponent = '';
-    if (acceptRecord.status <= 1) {
+    if (acceptRecord.status <= 1 && acceptRecord.client_id == localStorage.getItem('user_id')) {
         requestPriceComponent = <>
             {acceptRecord.status == 0 && !acceptRecord.enable_response_price ? <p>Pending Approval</p> : null}
             <div style={{display: 'flex'}}>
@@ -158,6 +169,16 @@ const TransactionChatRequest = () => {
                 <Button variant="contained" disabled={!acceptRecord.enable_request_price} onClick={requestPrice}>Request</Button>
             </div>
         </>
+    }
+    let responsePriceComponent = '';
+    if (acceptRecord.enable_response_price) {
+        responsePriceComponent = <>
+            <p style={{'font-weight': 'bold'}}>Request Price: &nbsp;<span style={{'color': 'red'}}>${acceptRecord.price_in_negotiation}</span></p>
+            <div style={{display: 'flex'}}>
+                <Button variant="contained" onClick={() => responsePrice(true)}>Accept</Button>&nbsp;&nbsp;
+                <Button variant="contained" onClick={() => responsePrice(false)}>Reject</Button>
+            </div>
+        </>;
     }
     if (!acceptId) {
         return <></>;
@@ -218,6 +239,7 @@ const TransactionChatRequest = () => {
                         <div style={{fontWeight: 'bold'}}>&nbsp;{acceptRecord.contractor_nickname}</div>
                     </div><br /><br />
                     {requestPriceComponent}
+                    {responsePriceComponent}
                 </div>
             </div>
         </>

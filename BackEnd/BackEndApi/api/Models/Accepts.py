@@ -161,3 +161,15 @@ class Accepts(models.Model):
             accept.save()
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def responseChangePrice(self, id, response, price_in_negotiation, fee_id):
+        try:
+            accept = Accepts.objects.get(id=id)
+            accept.price_in_negotiation = None
+            accept.status = AcceptStatus.AWAITING_PAYMENT
+            if response:
+                accept.price = price_in_negotiation
+                accept.fee_id = fee_id
+            accept.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
