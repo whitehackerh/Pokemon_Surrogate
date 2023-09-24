@@ -173,3 +173,11 @@ class Accepts(models.Model):
             accept.save()
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+        
+    def updateStatus(self, id, status):
+        try:
+            accept = Accepts.objects.get(id=id)
+            accept.status = status
+            accept.save()
+        except Exception as e:
+            raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
