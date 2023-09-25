@@ -118,6 +118,16 @@ const TransactionChatRequest = () => {
         });
     }
 
+    function completeTransactionAccept() {
+        withTokenRequest.post('completeTransactionAccept', {
+            accept_id: acceptId,
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getAcceptDetail();
+        });
+    }
+
     function handleChange(e, newValue, setterName, setterParams) {
         const target = e.target;
         const value = target.value;
@@ -214,6 +224,13 @@ const TransactionChatRequest = () => {
             <br /><br />
         </>;
     }
+    let completeComponent = '';
+    if (acceptRecord.enable_complete) {
+        completeComponent = <>
+            <ConfirmDialog text='Complete Transaction' message='Are you sure you want to complete transaction?' callback={completeTransactionAccept}/>
+            <br /><br />
+        </>;
+    }
     if (!acceptId) {
         return <></>;
     }
@@ -274,6 +291,7 @@ const TransactionChatRequest = () => {
                     </div><br /><br />
                     {payComponent}<br />
                     {deliverComponent}<br />
+                    {completeComponent}<br />
                     {requestPriceComponent}<br />
                     {responsePriceComponent}<br />
                 </div>
