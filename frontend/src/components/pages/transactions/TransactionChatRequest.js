@@ -108,6 +108,16 @@ const TransactionChatRequest = () => {
         });
     }
 
+    function deliverProductAccept() {
+        withTokenRequest.post('deliverProductAccept', {
+            accept_id: acceptId,
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getAcceptDetail();
+        });
+    }
+
     function handleChange(e, newValue, setterName, setterParams) {
         const target = e.target;
         const value = target.value;
@@ -197,6 +207,13 @@ const TransactionChatRequest = () => {
             <br /><br />
         </>;
     }
+    let deliverComponent = '';
+    if (acceptRecord.enable_deliver) {
+        deliverComponent = <>
+            <ConfirmDialog text='Complete Deliver' message='Are you sure you have completed delivery?' callback={deliverProductAccept}/>
+            <br /><br />
+        </>;
+    }
     if (!acceptId) {
         return <></>;
     }
@@ -255,9 +272,10 @@ const TransactionChatRequest = () => {
                         <img src={`data:image/jpeg;base64,${acceptRecord.contractor_profile_picture}`} style={profilePictureStyle}></img>
                         <div style={{fontWeight: 'bold'}}>&nbsp;{acceptRecord.contractor_nickname}</div>
                     </div><br /><br />
+                    {payComponent}<br />
+                    {deliverComponent}<br />
                     {requestPriceComponent}<br />
                     {responsePriceComponent}<br />
-                    {payComponent}<br />
                 </div>
             </div>
         </>
