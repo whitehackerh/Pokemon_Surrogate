@@ -45,6 +45,7 @@ from api.Views.ResponsePriceAcceptView import ResponsePriceAcceptView
 from api.Views.PayForAcceptView import PayForAcceptView
 from api.Views.DeliverProductAcceptView import DeliverProductAcceptView
 from api.Views.CompleteTransactionAcceptView import CompleteTransactionAcceptView
+from api.Views.CancelTransactionAcceptView import CancelTransactionAcceptView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -91,5 +92,6 @@ urlpatterns = [
     path('responsePriceAccept', ResponsePriceAcceptView.as_view(), name='responsePriceAccept'),
     path('payForAccept', PayForAcceptView.as_view(), name='payForAccept'),
     path('deliverProductAccept', DeliverProductAcceptView.as_view(), name='deliverProductAccept'),
-    path('completeTransactionAccept', CompleteTransactionAcceptView.as_view(), name='completeTransactionAccept')
+    path('completeTransactionAccept', CompleteTransactionAcceptView.as_view(), name='completeTransactionAccept'),
+    path('cancelTransactionAccept', CancelTransactionAcceptView.as_view(), name='cancelTransactionAccept')
 ]

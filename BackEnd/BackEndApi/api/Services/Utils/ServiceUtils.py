@@ -104,8 +104,8 @@ class ServiceUtils:
         record = model.getRequestDetail(request_id)
         return record.count() == 1 and record[0].client_id == client_id and record[0].status == RequestStatus.ACCEPTING
     
-    def isEnableCancelAccept(status, price_in_negotiation):
-        return (status == AcceptStatus.PRICE_NEGOTIATION and not price_in_negotiation) or status == AcceptStatus.AWAITING_PAYMENT or status == AcceptStatus.AWAITING_DELIVERY
+    def isEnableCancelAccept(status):
+        return status <= AcceptStatus.AWAITING_DELIVERY
     
     def isEnableRequestPriceAccept(status, user_id, client_id, contractor_id, price_in_negotiation):
         if user_id == client_id:

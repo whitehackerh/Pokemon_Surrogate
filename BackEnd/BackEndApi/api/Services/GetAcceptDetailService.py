@@ -68,7 +68,7 @@ class GetAcceptDetailService(BaseService):
                 },
                 'request_pictures': pictures,
                 'enables': {
-                    'cancel': ServiceUtils.isEnableCancelAccept(accept.status, accept.price_in_negotiation),
+                    'cancel': ServiceUtils.isEnableCancelAccept(accept.status),
                     'request_price': ServiceUtils.isEnableRequestPriceAccept(accept.status, user_id, accept.client_id, accept.contractor_id, accept.price_in_negotiation),
                     'response_price': ServiceUtils.isEnableResponsePriceAccept(accept.status, user_id, accept.client_id, accept.contractor_id, accept.price_in_negotiation),
                     'payment': ServiceUtils.isEnablePaymentAccept(accept.status, user_id, accept.client_id, accept.contractor_id),
