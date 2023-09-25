@@ -128,6 +128,16 @@ const TransactionChatRequest = () => {
         });
     }
 
+    function cancelTransactionAccept() {
+        withTokenRequest.post('cancelTransactionAccept', {
+            accept_id: acceptId,
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            getAcceptDetail();
+        });
+    }
+
     function handleChange(e, newValue, setterName, setterParams) {
         const target = e.target;
         const value = target.value;
@@ -231,6 +241,13 @@ const TransactionChatRequest = () => {
             <br /><br />
         </>;
     }
+    let cancelComponent = '';
+    if (acceptRecord.enable_cancel) {
+        cancelComponent = <>
+            <ConfirmDialog text='Cancel Transaction' message='Are you sure you want to cancel transaction?' callback={cancelTransactionAccept}/>
+            <br /><br />
+        </>;
+    }
     if (!acceptId) {
         return <></>;
     }
@@ -294,6 +311,7 @@ const TransactionChatRequest = () => {
                     {completeComponent}<br />
                     {requestPriceComponent}<br />
                     {responsePriceComponent}<br />
+                    {cancelComponent}<br />
                 </div>
             </div>
         </>
