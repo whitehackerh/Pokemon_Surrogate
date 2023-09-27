@@ -22,17 +22,31 @@ const TransactionChatRequest = () => {
     const [pictures, setPictures] = useState([]);
     const [acceptRecord, setAcceptRecord] = useState(null);
     const [inputPriceInNegotiation, setInputPriceInNegotiation] = useState(false);
+    /*-----*/
+    const [inputMessage, setInputMessage] = useState(null);
+    const [picturePreview, setPicturePreview] = useState(false);
+    const [pictureBlob, setPictureBlob] = useState(null);
+    const [avatarPicture, setAvatarPicture] = useState(null);
+    const [otherName, setOtherName] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [fetching, setFetching] = useState(false);
+    const [firstRequest, setFirstRequest] = useState(true);
+    const [displayedLatestId, setDisplayedLatestId] = useState(null);
+    const [deletingMessage, setDeletingMessage] = useState(false);
+    /*---*/
     requestHeaders.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
     multipartFormData.Authorization = `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`;
 
     useEffect(() => {
         if (acceptId) {
             getAcceptDetail();
+            getMessages();
         }
     }, []);
 
     useInterval(() => {
         getAcceptDetail();
+        getMessagesLatest();
     }, 5000);
 
     function getAcceptDetail() {
@@ -72,7 +86,56 @@ const TransactionChatRequest = () => {
                 enable_complete: data.enables.complete,
                 enable_send_message: data.enables.send_message
             });
+            setAvatarPicture(user_id == data.client.id ? data.client.profile_picture : data.contractor.profile_picture);
+            setOtherName(user_id == data.client_id ? data.client.nickname : data.contractor.nickname);
         })
+    }
+
+    function getMessages() {
+        setFetching(true);
+        withTokenRequest.post('/getMessagesAccept', {
+            accept_id: acceptId,
+            displayed_latest_id: null
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+            if (res.data.data.messages.length) {
+                setMessages(res.data.data.messages);
+                setReadMessages(res.data.data.messages[res.data.data.messages.length - 1].id);
+                setDisplayedLatestId(res.data.data.messages[res.data.data.messages.length - 1].id);
+            }
+            setFirstRequest(false);
+            setFetching(false);
+        })
+    }
+
+    function getMessagesLatest() {
+        if (!firstRequest && !fetching && !deletingMessage) {
+            setFetching(true);
+            withTokenRequest.post('/getMessagesAccept', {
+                accept_id: acceptId,
+                displayed_latest_id: displayedLatestId
+            }, {
+                headers: requestHeaders
+            }).then((res) => {
+                if (res.data.data.messages.length) {
+                    setDisplayedLatestId(res.data.data.messages[res.data.data.messages.length - 1].id);
+                    setMessages(prevArray => prevArray.concat(res.data.data.messages));
+                    setReadMessages(res.data.data.messages[res.data.data.messages.length - 1].id);
+                }
+                setFetching(false);
+            })
+        }
+    }
+
+    function setReadMessages(id) {
+        withTokenRequest.post('/setReadMessagesAccept', {
+            accept_id: acceptId,
+            displayed_latest_id: id
+        }, {
+            headers: requestHeaders
+        }).then((res) => {
+        });
     }
 
     function requestPrice() {
@@ -153,6 +216,109 @@ const TransactionChatRequest = () => {
             }
     }
 
+    const messageGroups = groupByDate(messages);
+    function groupByDate(messages) {
+        return messages.reduce((groups, message) => {
+            const date = new Date(message.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('/');
+            const lastGroup = groups[groups.length - 1];
+        
+            if (lastGroup && lastGroup.date === date) {
+              lastGroup.messages.push(message);
+            } else {
+              groups.push({ date, messages: [message] });
+            }
+            return groups;
+          }, []);
+    }
+
+    function sendMessage() {
+        let requestMessage = inputMessage;
+        if (requestMessage.includes('<inputmessage>')) {
+            requestMessage = requestMessage.substring(requestMessage.indexOf('<inputmessage>') + 14, requestMessage.indexOf('</inputmessage>'));
+            requestMessage = requestMessage.replace(/n/, '');
+        }
+        if (requestMessage == '' || !requestMessage.length || requestMessage == null) {
+            requestMessage = '';
+        }
+        const submitData = new FormData();
+        submitData.append('accept_id', acceptId);
+        submitData.append('message', requestMessage);
+        submitData.append('picture', pictureBlob);
+        withTokenRequest.post('/sendMessageAccept', submitData, {
+            headers: multipartFormData
+        }).then(() => {
+            setInputMessage(null);
+            setPicturePreview(false);
+            setPictureBlob(null);
+            getMessagesLatest();
+        })
+    }
+
+    const handleAttachClick = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (event) => {
+          const file = event.target.files[0];
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => {
+            setPicturePreview(true);
+            setPictureBlob(file);
+            setInputMessage(`
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+                <img src="${reader.result}" alt="attachment preview" width="200" style={{ zIndex: 1 }} />
+            </div><br><inputmessage>${inputMessage || ''}</inputmessage>
+            `);       
+          };
+        };
+        input.click();
+    };
+
+    function handleRemoveInputPicture() {
+        let temp = inputMessage.substring(inputMessage.indexOf('<inputmessage>') + 14, inputMessage.indexOf('</inputmessage>'));
+        if (temp < 0) {
+            setInputMessage(null);
+        } else {
+            setInputMessage(temp.replace(/n/, ''));
+        }
+        setPicturePreview(false);
+        setPictureBlob(null);
+    };
+
+    const handleInputMessage = (innerHtml, textContent, innerText, nodes) => {
+        if (inputMessage == null || !inputMessage.includes('<inputmessage></inputmessage>')) {
+            setInputMessage(innerHtml);
+        } else if (inputMessage.includes('<inputmessage></inputmessage>')) {
+            setInputMessage(inputMessage.replace('<inputmessage></inputmessage>', '<inputmessage>' + innerText + '</inputmessage>'))
+        }
+    };
+
+    const handleMouseEnter = (messageId) => {
+        if (acceptRecord.enable_send_message) {
+            document.getElementById(`delete-button-${messageId}`).style.display = "inline";
+            document.getElementById(`message-${messageId}`).style.marginLeft="5px";
+        }
+    }
+    
+    const handleMouseLeave = (messageId) => {
+        document.getElementById(`delete-button-${messageId}`).style.display = "none";
+        document.getElementById(`message-${messageId}`).style.removeProperty('margin-left');
+    }
+
+    const deleteMessage = (message) => {
+        setDeletingMessage(message);
+        withTokenRequest.post('/deleteMessageAccept', {
+            message_id: message,
+            accept_id: acceptId,
+        }, {
+            headers: requestHeaders
+        }).then(() => {
+            setDeletingMessage(null);
+            getMessages();
+        })
+    }
+
     const mainContents = {
         float: 'left',
         margin: '10px',
@@ -172,6 +338,24 @@ const TransactionChatRequest = () => {
         width: '50px',
         height: '50px'
     }
+    const styledTextArea = styled.textarea`
+        width: 100%;
+        height: 100%;
+        resize: none;
+        border: none;
+        padding: 10px;
+        font-size: 16px;
+        box-sizing: border-box;
+        white-space: pre-wrap;
+        caret-color: #2a9d8f;
+        `;
+    const messageFrame = {
+        margin: '20px auto',
+        border: 'solid black',
+        width: '100%',
+        position: 'relative',
+        height: '900px'
+    };
 
     if (!acceptRecord) {
         return (
@@ -312,6 +496,168 @@ const TransactionChatRequest = () => {
                     {requestPriceComponent}<br />
                     {responsePriceComponent}<br />
                     {cancelComponent}<br />
+                </div>
+
+                {/*  */}
+
+                <div style={messageFrame}>
+                    <ChatContainer>
+                        <ConversationHeader>
+                            <Avatar src={`data:image/jpeg;base64,${avatarPicture}`}></Avatar>
+                            <ConversationHeader.Content
+                                userName={otherName}
+                            />
+                        </ConversationHeader>
+                            <MessageList style={{height: '800px'}}>
+                            {messageGroups.map((group, index) => (
+                                <>
+                                {<MessageSeparator content={group.date}/>}
+                                {group.messages.map((message) => (
+                                    <>
+                                        {message.sender_id == localStorage.getItem('user_id') && message.message != null && !message.picture && (
+                                            <div style={{display: 'flex'}} key={message.id} onMouseEnter={() => handleMouseEnter(message.id)} onMouseLeave={() => handleMouseLeave(message.id)}>
+                                                <Delete
+                                                    id={`delete-button-${message.id}`}
+                                                    style={{ display: 'none', cursor: 'pointer', 'margin-right': '0px', 'margin-left': 'auto' }}
+                                                    onClick={() => {
+                                                        if (window.confirm('Are you sure you want to delete?')) {
+                                                            deleteMessage(message.id);
+                                                        }
+                                                    }}
+                                                />
+                                                <Message className="outgoing"
+                                                id={`message-${message.id}`}
+                                                model={{
+                                                message: message.message,
+                                                direction: 'outgoing',
+                                                position: 'single',
+                                                }}
+                                                >
+                                                    <Message.Footer sentTime={message.created_at.split('.')[0].split('T')[1]} />
+                                                </Message>
+                                            </div>
+                                        )}
+                                        {message.sender_id == localStorage.getItem('user_id') && message.message == null && message.picture && (
+                                            <div style={{display: 'flex'}} key={message.id} onMouseEnter={() => handleMouseEnter(message.id)} onMouseLeave={() => handleMouseLeave(message.id)}>
+                                                <Delete
+                                                    id={`delete-button-${message.id}`}
+                                                    style={{ display: 'none', cursor: 'pointer', 'margin-right': '0px', 'margin-left': 'auto' }}
+                                                    onClick={() => {
+                                                        if (window.confirm('Are you sure you want to delete?')) {
+                                                            deleteMessage(message.id);
+                                                        }
+                                                    }}
+                                                />
+                                                <Message className="outgoing"
+                                                id={`message-${message.id}`}
+                                                model={{
+                                                direction: 'outgoing',
+                                                position: 'single',
+                                                }}
+                                            >
+                                                <Message.ImageContent src={`data:image/jpeg;base64,${message.picture}`} alt="picture" width={300} />
+                                                <Message.Footer sentTime={message.created_at.split('.')[0].split('T')[1]} />
+                                            </Message>
+                                            </div>
+                                        )}
+                                        {message.sender_id == localStorage.getItem('user_id') && message.message != null && message.picture && (
+                                            <>
+                                                <div key={message.id} onMouseEnter={() => handleMouseEnter(message.id)} onMouseLeave={() => handleMouseLeave(message.id)}>
+                                                    <div style={{display: 'flex'}}>
+                                                        <Delete
+                                                            id={`delete-button-${message.id}`}
+                                                            style={{ display: 'none', cursor: 'pointer', 'margin-right': '0px', 'margin-left': 'auto' }}
+                                                            onClick={() => {
+                                                                if (window.confirm('Are you sure you want to delete?')) {
+                                                                    deleteMessage(message.id);
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Message className="outgoing"
+                                                        id={`message-${message.id}`}
+                                                        model={{
+                                                        direction: 'outgoing',
+                                                        position: 'single',
+                                                        }}
+                                                    >
+                                                        <Message.ImageContent src={`data:image/jpeg;base64,${message.picture}`} alt="picture" width={300} />
+                                                    </Message>
+                                                    </div>
+                                                    <Message
+                                                        model={{
+                                                            message: message.message,
+                                                            direction: 'outgoing',
+                                                            position: 'bottom',
+                                                        }}
+                                                    ><Message.Footer sentTime={message.created_at.split('.')[0].split('T')[1]} />
+                                                    </Message>
+                                                </div>
+                                            </>
+                                        )}
+                                        {message.sender_id != localStorage.getItem('user_id') && message.message != null && !message.picture && (
+                                                <Message
+                                                model={{
+                                                message: message.message,
+                                                direction: 'incoming',
+                                                position: 'single',
+                                                }}
+                                                >
+                                                    <Message.Footer sender={message.created_at.split('.')[0].split('T')[1]} />
+                                                </Message>
+                                        )}
+                                        {message.sender_id != localStorage.getItem('user_id') && message.message == null && message.picture && (
+                                                <Message
+                                                model={{
+                                                direction: 'incoming',
+                                                position: 'single',
+                                                }}
+                                            >
+                                                <Message.ImageContent src={`data:image/jpeg;base64,${message.picture}`} alt="picture" width={300} />
+                                                <Message.Footer sender={message.created_at.split('.')[0].split('T')[1]} />
+                                            </Message>
+                                        )}
+                                        {message.sender_id != localStorage.getItem('user_id') && message.message != null && message.picture && (
+                                            <>
+                                                <Message
+                                                model={{
+                                                direction: 'incoming',
+                                                position: 'single',
+                                                }}
+                                                >
+                                                    <Message.ImageContent src={`data:image/jpeg;base64,${message.picture}`} alt="picture" width={300} />
+                                                </Message>
+                                                <Message
+                                                    model={{
+                                                        message: message.message,
+                                                        direction: 'incoming',
+                                                        position: 'bottom',
+                                                    }}
+                                                >
+                                                    <Message.Footer sender={message.created_at.split('.')[0].split('T')[1]} />
+                                                </Message>
+                                            </> 
+                                        )}
+                                    </>
+                                ))}
+                                </>
+                            ))}
+                            </MessageList>
+                        <MessageInput
+                            placeholder="Type your message here..."
+                            multiline={true}
+                            onSend={sendMessage}
+                            value={inputMessage}
+                            onChange={handleInputMessage}
+                            attachButton={true}
+                            attachDisabled={picturePreview}
+                            sendButton={true}
+                            sendDisabled={false}
+                            onAttachClick={handleAttachClick}
+                            style={{styledTextArea}}
+                         >
+                        </MessageInput>
+                    </ChatContainer>
+                    <Delete className="deletePreview" style={{visibility: picturePreview ? 'visible' : 'hidden', width: '30px', position: 'absolute', top: '800px', left: '6px'}} onClick={handleRemoveInputPicture}></Delete>
                 </div>
             </div>
         </>

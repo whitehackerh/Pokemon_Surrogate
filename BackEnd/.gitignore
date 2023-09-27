@@ -11,6 +11,7 @@ db.sqlite3
 /BackEndApi/media/listing
 /BackEndApi/media/message_purchase_request
 /BackEndApi/media/request
+/BackEndApi/media/message_accept
 /staticfiles
 settings_local.py
 

@@ -7,3 +7,4 @@ class Path:
     LOGO = os.path.join('default', 'logo.png')
     PURCHASE_REQUEST_MESSAGE_PICTURE_DIR = 'message_purchase_request'
     REQUEST_PICTURE_DIR = 'request'
+    ACCEPT_MESSAGE_PICTURE_DIR = 'message_accept'

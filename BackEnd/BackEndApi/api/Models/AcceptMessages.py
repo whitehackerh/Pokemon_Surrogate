@@ -5,8 +5,8 @@ from api.Exceptions.CustomExceptions import CustomExceptions
 from django.utils import timezone
 from django.db.models import Q
 
-class PurchaseRequestMessages(models.Model):
-    purchase_request_id = models.IntegerField()
+class AcceptMessages(models.Model):
+    accept_id = models.IntegerField()
     sender_id = models.IntegerField()
     message = models.TextField(null=True)
     picture = models.CharField(null=True, max_length=255)
@@ -16,40 +16,41 @@ class PurchaseRequestMessages(models.Model):
 
     class Meta:
         app_label = 'api'
-        db_table = 'purchase_request_messages'
-    
+        db_table = 'accept_messages'
+
     def setPicture(self, id, filename):
         try:
-            message = PurchaseRequestMessages.objects.get(id=id)
+            message = AcceptMessages.objects.get(id=id)
             message.picture = filename
             message.save()
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
-    
-    def getMessages(self, purchase_request_id):
+        
+    def getMessages(self, accept_id):
         try:
-            return PurchaseRequestMessages.objects.filter(purchase_request_id=purchase_request_id, deleted_at__isnull=True).order_by('id')
+            return AcceptMessages.objects.filter(accept_id=accept_id, deleted_at__isnull=True).order_by('id')
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
     
-    def getMessagesLatest(self, purchase_request_id, id):
+    def getMessagesLatest(self, accept_id, id):
         try:
-            return PurchaseRequestMessages.objects.filter(purchase_request_id=purchase_request_id, deleted_at__isnull=True, id__gt=id).order_by('id')
+            return AcceptMessages.objects.filter(accept_id=accept_id, deleted_at__isnull=True, id__gt=id).order_by('id')
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
-    
-    def setReadMessages(self, purchase_request_id, user_id, id):
+        
+    def setReadMessages(self, accept_id, user_id, id):
         try:
-            PurchaseRequestMessages.objects.filter(
+            AcceptMessages.objects.filter(
                 ~Q(sender_id=user_id)
                 & Q(id__lte=id),
-                purchase_request_id=purchase_request_id,
+                accept_id=accept_id,
             ).update(read=Read.READ)
         except Exception as e:
             raise CustomExceptions(str(e), ResponseCodes.INTERNAL_SERVER_ERROR)
-        
+    
     def getMessage(self, id):
         try:
-            return PurchaseRequestMessages.objects.get(id=id)
+            return AcceptMessages.objects.get(id=id)
         except Exception as e:
             raise CustomExceptions(e, ResponseCodes.INTERNAL_SERVER_ERROR)
+    

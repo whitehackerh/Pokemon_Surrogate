@@ -46,6 +46,10 @@ from api.Views.PayForAcceptView import PayForAcceptView
 from api.Views.DeliverProductAcceptView import DeliverProductAcceptView
 from api.Views.CompleteTransactionAcceptView import CompleteTransactionAcceptView
 from api.Views.CancelTransactionAcceptView import CancelTransactionAcceptView
+from api.Views.SendMessageAcceptView import SendMessageAcceptView
+from api.Views.GetMessagesAcceptView import GetMessagesAcceptView
+from api.Views.SetReadMessagesAcceptView import SetReadMessagesAcceptView
+from api.Views.DeleteMessageAcceptView import DeleteMessageAcceptView
 
 urlpatterns = [
     path('signupStaff', SignupStaffView.as_view(), name='signupStaff'),
@@ -93,5 +97,9 @@ urlpatterns = [
     path('payForAccept', PayForAcceptView.as_view(), name='payForAccept'),
     path('deliverProductAccept', DeliverProductAcceptView.as_view(), name='deliverProductAccept'),
     path('completeTransactionAccept', CompleteTransactionAcceptView.as_view(), name='completeTransactionAccept'),
-    path('cancelTransactionAccept', CancelTransactionAcceptView.as_view(), name='cancelTransactionAccept')
+    path('cancelTransactionAccept', CancelTransactionAcceptView.as_view(), name='cancelTransactionAccept'),
+    path('sendMessageAccept', SendMessageAcceptView.as_view(), name='sendMessageAccept'),
+    path('getMessagesAccept', GetMessagesAcceptView.as_view(), name='getMessagesAccept'),
+    path('setReadMessagesAccept', SetReadMessagesAcceptView.as_view(), name='setReadMessagesAccept'),
+    path('deleteMessageAccept', DeleteMessageAcceptView.as_view(), name='deleteMessageAccept')
 ]
