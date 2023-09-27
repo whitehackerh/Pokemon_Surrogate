@@ -667,7 +667,7 @@ const TransactionChatListing = () => {
                          >
                         </MessageInput>
                     </ChatContainer>
-                    <Delete className="deletePreview" style={{visibility: picturePreview ? 'visible' : 'hidden', width: '30px', position: 'absolute', top: '720px', left: '6px'}} onClick={handleRemoveInputPicture}></Delete>
+                    <Delete className="deletePreview" style={{visibility: picturePreview ? 'visible' : 'hidden', width: '30px', position: 'absolute', top: '800px', left: '6px'}} onClick={handleRemoveInputPicture}></Delete>
                 </div>
             </div>
         </>
